@@ -1,0 +1,112 @@
+{
+  "name": "Merge Test - Simplified",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dummy AI Data\nreturn {\n  text: '{\"saintIntro\": \"Test saint information\", \"reflection\": \"Test spiritual reflection\", \"challenge\": \"Test challenge\", \"prayer\": \"Test prayer\", \"historicalFacts\": [{\"year\": \"2024\", \"fact\": \"Test historical fact\"}]}',\n  dataType: 'ai'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 200],
+      "id": "dummy-ai",
+      "name": "Dummy AI Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dummy MLB Data\nreturn {\n  dataType: 'mlb',\n  dateInfo: {\n    today: 'Monday, August 26, 2024',\n    theme: 'Humility & Simplicity',\n    dayOfWeek: 'Monday'\n  },\n  game: {\n    score: 'LAD 8, Cincinnati Reds 4',\n    gameUrl: 'https://www.mlb.com/dodgers'\n  },\n  standings: {\n    wins: 85,\n    losses: 58\n  },\n  fullRecord: '85-58',\n  standingSummary: '1st in NL West'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 400],
+      "id": "dummy-mlb",
+      "name": "Dummy MLB Data"
+    },
+    {
+      "parameters": {
+        "mode": "waitForAll"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [500, 300],
+      "id": "test-merge",
+      "name": "Test Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Test Email Compiler - Process merged data\nconst items = $input.all();\nconsole.log('Received items count:', items.length);\n\n// Find AI and MLB data from the merged inputs\nlet aiData = null;\nlet mlbData = null;\n\nfor (const item of items) {\n  const data = item.json;\n  console.log('Processing item:', JSON.stringify(data, null, 2));\n  \n  if (data.dataType === 'ai' || data.text) {\n    aiData = data;\n    console.log('Found AI data');\n  } else if (data.dataType === 'mlb') {\n    mlbData = data;\n    console.log('Found MLB data');\n  }\n}\n\n// Create fallback data if needed\nif (!mlbData) {\n  console.log('No MLB data found, using fallback');\n  mlbData = {\n    dateInfo: { today: 'Test Day', theme: 'Test Theme' },\n    game: { score: 'No game data' },\n    standings: { wins: 0, losses: 0 },\n    fullRecord: '0-0'\n  };\n}\n\nif (!aiData) {\n  console.log('No AI data found, using fallback');\n  aiData = { text: '{\"reflection\": \"Fallback reflection\"}', dataType: 'ai' };\n}\n\n// Parse AI content\nlet spiritual = {};\ntry {\n  const aiText = aiData.text || '{}';\n  spiritual = JSON.parse(aiText);\n  console.log('Parsed AI content successfully');\n} catch (e) {\n  console.log('Error parsing AI content:', e.message);\n  spiritual = { reflection: 'Fallback spiritual content' };\n}\n\n// Create simple test output\nconst result = {\n  success: true,\n  message: 'Merge and processing successful',\n  data: {\n    aiDataFound: !!aiData,\n    mlbDataFound: !!mlbData,\n    spiritualReflection: spiritual.reflection || 'No reflection',\n    gameScore: mlbData.game?.score || 'No game score',\n    todaysDate: mlbData.dateInfo?.today || 'No date'\n  }\n};\n\nconsole.log('Final result:', JSON.stringify(result, null, 2));\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "test-compiler",
+      "name": "Test Email Compiler"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Dummy AI Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Dummy MLB Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dummy AI Data": {
+      "main": [
+        [
+          {
+            "node": "Test Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dummy MLB Data": {
+      "main": [
+        [
+          {
+            "node": "Test Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Test Merge": {
+      "main": [
+        [
+          {
+            "node": "Test Email Compiler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": ["test", "merge", "debug"]
+}

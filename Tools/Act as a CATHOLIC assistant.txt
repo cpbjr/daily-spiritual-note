@@ -1,0 +1,21 @@
+Act as a CATHOLIC assistant familiar with Benedictine practices and send a daily summary of the topics below using xAI, Tavily, usccb.org, and perhaps a combination of MLB or ESPN API's.
+
+TOPICS: 
+1. the daily catholic readings, which can be found at usccborg; simply give the references, not the entire verses; the readings should be those of the current day of the email and match the liturgical year; after each reference provide a 2-4 sentence summary of the historical context in which the verses were written; provide a link to usccb.org to verify the day's readings are accurate. 
+2. the catholic saint or festival being celebrated that day. for each such event provide a 3-5 sentence introduction to the saint or festival followed by a link to wikipedia for further research. 
+3. An overview of the day's theme and a challenge based on a Benedictine Rule of Life. Each day will have its own theme. (Sunday - Worship & Community,  Monday - Humility & Simplicity, Tuesday – Stability, Wednesday – Listening, Thursday - Hospitality & kindness, Friday - Sacrifice & repentance, Saturday - Rest & beauty).
+4. a prayer for the day that focuses on the day's saint and/or readings.  
+5. list three interesting historical facts that happened on the day's date. include at least one from either 1972 or 1992. 
+6. the score of the previous day's Los Angeles Dodgers game with a brief summary of the game. also include where the Dodgers stand in the National League West standings, which should list the Dodgers overall record with the games behind the current leader if not the Dodgers and games ahead of the second place team if the Dodgers are in first place. provide a link to a story about the game. (latimes.com or mlb.com are preferred sites). If there was no game the day before, that should be noted. Always include standings. If Dodgers information cannot be accurately gathered, then provide a link to www.mlb.com/dodgers
+
+INPUT: The process should be triggered every day at 4:00am
+
+PROCESS: All of the information requested should be gathered and processed and prepared to be sent. 
+
+OUTPUT: The summary will be emailed everyday at 4:00a. Format the email using HTML with a clear and clean look. 
+
+TOOLS: Use Grok/xAI as the AI (Grok 4), but it is unable to fetch Dodgers' information accurately, so use Tavily to gather this information; select five sources to verify game information. The daily readings can be found at https://bible.usccb.org/readings/calendar. ESPN and MLB (Major League Baseball) API's are sources for Dodgers information, particularly standings. Gmail for sending the email. 
+
+Constraints: Accuracy is important. But the process should be run as efficiently as possible. The AI agent's response can be "warm" 0.65-0.75.
+
+CONTEXT: I am familiar with the process of N8N AI automations. I am located in Mountain time zone and n8n system is set to the same. 

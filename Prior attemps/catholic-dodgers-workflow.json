@@ -1,0 +1,351 @@
+{
+  "name": "Daily Catholic & Dodgers Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24,
+              "triggerAtHour": 4
+            }
+          ]
+        }
+      },
+      "id": "d8f9a6f1-b7e4-4c32-9d5a-1a2b3c4d5e6f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get current date and format for various APIs\nconst now = new Date();\nconst dateInfo = {\n  fullDate: now.toISOString().split('T')[0],\n  month: String(now.getMonth() + 1).padStart(2, '0'),\n  day: String(now.getDate()).padStart(2, '0'),\n  year: now.getFullYear(),\n  yearShort: String(now.getFullYear()).slice(-2),\n  dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()],\n  yesterdayDate: new Date(now.getTime() - 24*60*60*1000).toISOString().split('T')[0],\n  liturgicalDate: `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getFullYear()).slice(-2)}`,\n  displayDate: `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`\n};\n\n// Benedictine themes by day\nconst themes = {\n  'Sunday': 'Worship & Community',\n  'Monday': 'Humility & Simplicity', \n  'Tuesday': 'Stability',\n  'Wednesday': 'Listening',\n  'Thursday': 'Hospitality & Kindness',\n  'Friday': 'Sacrifice & Repentance',\n  'Saturday': 'Rest & Beauty'\n};\n\ndateInfo.benedictineTheme = themes[dateInfo.dayOfWeek];\n\nreturn dateInfo;"
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Format Date & Theme",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://bible.usccb.org/bible/readings/{{ $json.liturgicalDate }}.cfm",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "name": "Fetch USCCB Readings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.tavily.com/search",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "={{ $credentials.tavilyApi.apiKey }}"
+            },
+            {
+              "name": "query",
+              "value": "=\"Los Angeles Dodgers game \" + $json.yesterdayDate + \" score summary MLB\""
+            },
+            {
+              "name": "search_depth",
+              "value": "advanced"
+            },
+            {
+              "name": "max_results",
+              "value": "5"
+            },
+            {
+              "name": "include_raw_content",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+      "name": "Tavily - Dodgers Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 400],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1",
+          "name": "Tavily API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.x.ai/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $credentials.xAiApi.apiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"grok-2-1212\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a knowledgeable Catholic assistant familiar with Benedictine spirituality. Provide accurate, thoughtful, and warm responses about Catholic traditions, saints, and scripture.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Based on the USCCB readings page content below, extract and format:\\n\\n1. Today's reading references (just book chapter:verses, not full text)\\n2. For each reading, provide 2-4 sentences of historical context\\n3. Identify the saint or feast celebrated today\\n4. Provide 3-5 sentences about the saint/feast\\n\\nUSCCB Content:\\n{{ $('Fetch USCCB Readings').item.json.body }}\\n\\nDate: {{ $('Format Date & Theme').item.json.fullDate }}\\n\\nReturn as JSON with structure: {\\\"readings\\\": [{\\\"reference\\\": \\\"...\\\", \\\"context\\\": \\\"...\\\"}], \\\"saint\\\": {\\\"name\\\": \\\"...\\\", \\\"description\\\": \\\"...\\\"}}\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 1000\n}",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-456789012345",
+      "name": "xAI - Process Readings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2",
+          "name": "xAI API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.x.ai/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $credentials.xAiApi.apiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"grok-2-1212\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a Catholic assistant who creates meaningful daily reflections based on Benedictine spirituality.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Create a daily reflection for {{ $('Format Date & Theme').item.json.dayOfWeek }} with theme: {{ $('Format Date & Theme').item.json.benedictineTheme }}\\n\\nIncorporate these readings:\\n{{ $('xAI - Process Readings').item.json.choices[0].message.content }}\\n\\nProvide:\\n1. An overview connecting today's readings to the Benedictine theme (3-4 sentences)\\n2. A practical challenge based on the Rule of St. Benedict (2-3 sentences)\\n3. A prayer incorporating the saint and readings (4-6 lines)\\n\\nReturn as JSON with structure: {\\\"overview\\\": \\\"...\\\", \\\"challenge\\\": \\\"...\\\", \\\"prayer\\\": \\\"...\\\"}\"\n    }\n  ],\n  \"temperature\": 0.75,\n  \"max_tokens\": 800\n}",
+        "options": {}
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-567890123456",
+      "name": "xAI - Benedictine Reflection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.x.ai/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $credentials.xAiApi.apiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"grok-2-1212\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"List 3 interesting historical facts that happened on {{ $('Format Date & Theme').item.json.month }}/{{ $('Format Date & Theme').item.json.day }} (any year). Include at least one from either 1972 or 1992. Return as JSON array with structure: [{\\\"year\\\": \\\"YYYY\\\", \\\"fact\\\": \\\"...\\\"}]\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 400\n}",
+        "options": {}
+      },
+      "id": "f6a7b8c9-d0e1-2345-fabc-678901234567",
+      "name": "xAI - Historical Facts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://statsapi.mlb.com/api/v1/standings?leagueId=104&season={{ $('Format Date & Theme').item.json.year }}&standingsTypes=regularSeason&hydrate=team",
+        "options": {}
+      },
+      "id": "a7b8c9d0-e1f2-3456-abcd-789012345678",
+      "name": "MLB API - Standings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process all the gathered data\nconst dateInfo = $('Format Date & Theme').item.json;\n\n// Parse xAI responses\nlet readings, reflection, history;\ntry {\n  const readingsResponse = $('xAI - Process Readings').item.json.choices[0].message.content;\n  readings = JSON.parse(readingsResponse);\n} catch (e) {\n  readings = { readings: [], saint: { name: 'Saint of the Day', description: 'Information unavailable' }};\n}\n\ntry {\n  const reflectionResponse = $('xAI - Benedictine Reflection').item.json.choices[0].message.content;\n  reflection = JSON.parse(reflectionResponse);\n} catch (e) {\n  reflection = { overview: 'Reflection unavailable', challenge: 'Challenge unavailable', prayer: 'Prayer unavailable' };\n}\n\ntry {\n  const historyResponse = $('xAI - Historical Facts').item.json.choices[0].message.content;\n  history = JSON.parse(historyResponse);\n} catch (e) {\n  history = [];\n}\n\n// Process Dodgers info from Tavily\nlet gameInfo = 'No game yesterday';\nlet gameLink = 'https://www.mlb.com/dodgers';\n\nconst tavilyData = $('Tavily - Dodgers Search').item.json;\nif (tavilyData?.results && Array.isArray(tavilyData.results) && tavilyData.results.length > 0) {\n  const gameResult = tavilyData.results[0];\n  gameInfo = gameResult.content || gameResult.title || 'Game information unavailable';\n  gameLink = gameResult.url || 'https://www.mlb.com/dodgers';\n}\n\n// Process MLB standings\nlet dodgersStandings = 'Standings unavailable';\nconst standings = $('MLB API - Standings').item.json;\n\nif (standings?.records?.[0]?.teamRecords) {\n  const nlWest = standings.records[0].teamRecords;\n  const dodgers = nlWest.find(team => team.team.name === 'Los Angeles Dodgers');\n  \n  if (dodgers) {\n    const position = dodgers.divisionRank;\n    const record = `${dodgers.wins}-${dodgers.losses}`;\n    const gb = dodgers.gamesBack === '-' ? '0' : dodgers.gamesBack;\n    \n    if (position === '1') {\n      const secondPlace = nlWest.find(team => team.divisionRank === '2');\n      const gamesAhead = secondPlace ? secondPlace.gamesBack : '0';\n      dodgersStandings = `Dodgers (${record}) - 1st in NL West, ${gamesAhead} games ahead`;\n    } else {\n      dodgersStandings = `Dodgers (${record}) - ${position} in NL West, ${gb} GB`;\n    }\n  }\n}\n\n// Compile beautiful HTML email\nconst emailSubject = `Daily Reflection - ${dateInfo.dayOfWeek}, ${dateInfo.liturgicalDate}`;\n\nconst emailBody = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>${emailSubject}</title>\n</head>\n<body style=\"margin: 0; padding: 0; font-family: 'Georgia', 'Times New Roman', serif; background-color: #f5f5f0;\">\n  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 20px rgba(0,0,0,0.1);\">\n    \n    <!-- Header -->\n    <div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;\">\n      <h1 style=\"margin: 0; font-size: 28px; font-weight: normal; letter-spacing: 1px;\">Daily Reflection</h1>\n      <p style=\"margin: 10px 0 0 0; font-size: 18px; opacity: 0.95;\">${dateInfo.dayOfWeek}, ${dateInfo.displayDate}</p>\n    </div>\n    \n    <!-- Main Content -->\n    <div style=\"padding: 30px 25px;\">\n      \n      <!-- Readings Section -->\n      <div style=\"margin-bottom: 35px;\">\n        <h2 style=\"color: #4a5568; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;\">\n          📖 Today's Readings\n        </h2>\n        ${readings.readings.map(r => `\n        <div style=\"background-color: #f7fafc; border-left: 3px solid #667eea; padding: 12px 15px; margin-bottom: 12px;\">\n          <strong style=\"color: #2d3748; font-size: 16px;\">${r.reference}</strong>\n          <p style=\"margin: 8px 0 0 0; color: #4a5568; line-height: 1.6; font-size: 14px;\">${r.context}</p>\n        </div>`).join('')}\n        <p style=\"margin-top: 15px; text-align: center;\">\n          <a href=\"https://bible.usccb.org/bible/readings/${dateInfo.liturgicalDate}.cfm\" \n             style=\"color: #667eea; text-decoration: none; font-size: 14px; border-bottom: 1px dotted #667eea;\">\n            Verify today's readings at USCCB.org →\n          </a>\n        </p>\n      </div>\n      \n      <!-- Saint of the Day -->\n      <div style=\"margin-bottom: 35px;\">\n        <h2 style=\"color: #4a5568; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;\">\n          ✝️ Saint of the Day\n        </h2>\n        <div style=\"background-color: #fef5e7; border-radius: 8px; padding: 15px;\">\n          <h3 style=\"margin: 0 0 10px 0; color: #764ba2; font-size: 18px;\">${readings.saint.name}</h3>\n          <p style=\"margin: 0 0 12px 0; color: #4a5568; line-height: 1.7; font-size: 14px;\">${readings.saint.description}</p>\n          <a href=\"https://en.wikipedia.org/wiki/${readings.saint.name.replace(/ /g, '_')}\" \n             style=\"color: #667eea; text-decoration: none; font-size: 14px; border-bottom: 1px dotted #667eea;\">\n            Learn more on Wikipedia →\n          </a>\n        </div>\n      </div>\n      \n      <!-- Benedictine Reflection -->\n      <div style=\"margin-bottom: 35px;\">\n        <h2 style=\"color: #4a5568; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;\">\n          🕊️ Benedictine Reflection: ${dateInfo.benedictineTheme}\n        </h2>\n        <div style=\"background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 8px; padding: 20px;\">\n          <div style=\"margin-bottom: 15px;\">\n            <h4 style=\"margin: 0 0 8px 0; color: #2d3748; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;\">Overview</h4>\n            <p style=\"margin: 0; color: #4a5568; line-height: 1.7; font-size: 14px;\">${reflection.overview}</p>\n          </div>\n          <div style=\"background-color: rgba(255,255,255,0.7); border-radius: 6px; padding: 12px;\">\n            <h4 style=\"margin: 0 0 8px 0; color: #764ba2; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;\">Daily Challenge</h4>\n            <p style=\"margin: 0; color: #4a5568; line-height: 1.6; font-size: 14px; font-weight: 500;\">${reflection.challenge}</p>\n          </div>\n        </div>\n      </div>\n      \n      <!-- Prayer -->\n      <div style=\"margin-bottom: 35px;\">\n        <h2 style=\"color: #4a5568; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;\">\n          🙏 Prayer for Today\n        </h2>\n        <div style=\"text-align: center; padding: 20px; background-color: #faf5ff; border-radius: 8px;\">\n          <p style=\"margin: 0; color: #553c9a; line-height: 1.8; font-size: 15px; font-style: italic;\">\n            ${reflection.prayer.replace(/\\n/g, '<br/>')}\n          </p>\n        </div>\n      </div>\n      \n      <!-- Historical Facts -->\n      <div style=\"margin-bottom: 35px;\">\n        <h2 style=\"color: #4a5568; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;\">\n          📅 On This Day in History\n        </h2>\n        <ul style=\"margin: 0; padding: 0; list-style: none;\">\n          ${history.map(h => `\n          <li style=\"margin-bottom: 10px; padding-left: 25px; position: relative; color: #4a5568; line-height: 1.6; font-size: 14px;\">\n            <span style=\"position: absolute; left: 0; color: #667eea; font-weight: bold;\">${h.year}:</span>\n            <span style=\"display: inline-block; margin-left: 50px;\">${h.fact}</span>\n          </li>`).join('')}\n        </ul>\n      </div>\n      \n      <!-- Dodgers Update -->\n      <div style=\"margin-bottom: 30px;\">\n        <h2 style=\"color: #4a5568; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;\">\n          ⚾ Dodgers Update\n        </h2>\n        <div style=\"background: linear-gradient(135deg, #005a9c 0%, #003d6b 100%); color: white; border-radius: 8px; padding: 20px;\">\n          <div style=\"margin-bottom: 12px;\">\n            <strong style=\"display: inline-block; width: 100px; font-size: 13px; opacity: 0.9;\">Previous Game:</strong>\n            <span style=\"font-size: 14px;\">${gameInfo}</span>\n          </div>\n          <div style=\"margin-bottom: 15px;\">\n            <strong style=\"display: inline-block; width: 100px; font-size: 13px; opacity: 0.9;\">Standings:</strong>\n            <span style=\"font-size: 14px; font-weight: 600;\">${dodgersStandings}</span>\n          </div>\n          <div style=\"text-align: center; margin-top: 18px;\">\n            <a href=\"${gameLink}\" \n               style=\"display: inline-block; background-color: white; color: #005a9c; padding: 10px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 14px;\">\n              Read Full Game Recap →\n            </a>\n          </div>\n        </div>\n      </div>\n      \n    </div>\n    \n    <!-- Footer -->\n    <div style=\"background-color: #f7fafc; padding: 25px; text-align: center; border-top: 1px solid #e2e8f0;\">\n      <p style=\"margin: 0; color: #718096; font-size: 16px; font-style: italic; line-height: 1.6;\">\n        \"Always we begin again\"<br/>\n        <span style=\"font-size: 14px; font-style: normal;\">- St. Benedict</span>\n      </p>\n      <p style=\"margin: 15px 0 0 0; color: #a0aec0; font-size: 12px;\">\n        Daily Reflection • Benedictine Spirituality • Los Angeles Dodgers\n      </p>\n    </div>\n    \n  </div>\n</body>\n</html>\n`;\n\nreturn {\n  subject: emailSubject,\n  html: emailBody,\n  text: emailBody.replace(/<[^>]*>/g, ''),\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "b8c9d0e1-f2a3-4567-bcde-890123456789",
+      "name": "Compile Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 350]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@domain.com",
+        "toEmail": "recipient@domain.com",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "c9d0e1f2-a3b4-5678-cdef-901234567890",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1450, 350],
+      "credentials": {
+        "smtp": {
+          "id": "3",
+          "name": "SMTP Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format Date & Theme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Date & Theme": {
+      "main": [
+        [
+          {
+            "node": "Fetch USCCB Readings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Tavily - Dodgers Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch USCCB Readings": {
+      "main": [
+        [
+          {
+            "node": "xAI - Process Readings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "xAI - Process Readings": {
+      "main": [
+        [
+          {
+            "node": "xAI - Benedictine Reflection",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "xAI - Historical Facts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily - Dodgers Search": {
+      "main": [
+        [
+          {
+            "node": "MLB API - Standings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "xAI - Benedictine Reflection": {
+      "main": [
+        [
+          {
+            "node": "Compile Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "xAI - Historical Facts": {
+      "main": [
+        [
+          {
+            "node": "Compile Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MLB API - Standings": {
+      "main": [
+        [
+          {
+            "node": "Compile Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile Email": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Denver",
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

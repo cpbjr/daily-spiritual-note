@@ -1,0 +1,165 @@
+{
+  "name": "Alternative Merge Test - No Merge Node",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dummy AI Data\nreturn {\n  text: '{\"saintIntro\": \"Test saint information\", \"reflection\": \"Test spiritual reflection\", \"challenge\": \"Test challenge\", \"prayer\": \"Test prayer\", \"historicalFacts\": [{\"year\": \"2024\", \"fact\": \"Test historical fact\"}]}',\n  dataType: 'ai'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 200],
+      "id": "dummy-ai",
+      "name": "Dummy AI Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dummy MLB Data\nreturn {\n  dataType: 'mlb',\n  dateInfo: {\n    today: 'Monday, August 26, 2024',\n    theme: 'Humility & Simplicity',\n    dayOfWeek: 'Monday'\n  },\n  game: {\n    score: 'LAD 8, Cincinnati Reds 4',\n    gameUrl: 'https://www.mlb.com/dodgers'\n  },\n  standings: {\n    wins: 85,\n    losses: 58\n  },\n  fullRecord: '85-58',\n  standingSummary: '1st in NL West'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 400],
+      "id": "dummy-mlb",
+      "name": "Dummy MLB Data"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "executionId",
+              "value": "={{ $json.executionId || $execution.id }}"
+            },
+            {
+              "name": "dataType",
+              "value": "={{ $json.dataType }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 200],
+      "id": "set-ai-data",
+      "name": "Set AI Data"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "executionId",
+              "value": "={{ $json.executionId || $execution.id }}"
+            },
+            {
+              "name": "dataType", 
+              "value": "={{ $json.dataType }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 400],
+      "id": "set-mlb-data",
+      "name": "Set MLB Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Alternative Merge - Collect data from both paths manually\n// This approach gets data from previous nodes by ID rather than using merge\n\nlet aiData = null;\nlet mlbData = null;\n\n// Try to get AI data from Set AI Data node\ntry {\n  const aiContent = $('Set AI Data').item?.json?.content;\n  if (aiContent) {\n    aiData = JSON.parse(aiContent);\n    console.log('Successfully retrieved AI data');\n  }\n} catch (e) {\n  console.log('Error getting AI data:', e.message);\n}\n\n// Try to get MLB data from Set MLB Data node  \ntry {\n  const mlbContent = $('Set MLB Data').item?.json?.content;\n  if (mlbContent) {\n    mlbData = JSON.parse(mlbContent);\n    console.log('Successfully retrieved MLB data');\n  }\n} catch (e) {\n  console.log('Error getting MLB data:', e.message);\n}\n\n// Create fallback data if needed\nif (!mlbData) {\n  console.log('No MLB data found, using fallback');\n  mlbData = {\n    dateInfo: { today: 'Test Day', theme: 'Test Theme' },\n    game: { score: 'No game data' },\n    standings: { wins: 0, losses: 0 },\n    fullRecord: '0-0'\n  };\n}\n\nif (!aiData) {\n  console.log('No AI data found, using fallback');\n  aiData = { text: '{\"reflection\": \"Fallback reflection\"}', dataType: 'ai' };\n}\n\n// Parse AI content\nlet spiritual = {};\ntry {\n  const aiText = aiData.text || '{}';\n  spiritual = JSON.parse(aiText);\n  console.log('Parsed AI content successfully');\n} catch (e) {\n  console.log('Error parsing AI content:', e.message);\n  spiritual = { reflection: 'Fallback spiritual content' };\n}\n\n// Create combined output\nconst result = {\n  success: true,\n  message: 'Alternative merge successful - no merge node used',\n  method: 'direct_node_reference',\n  data: {\n    aiDataFound: !!aiData,\n    mlbDataFound: !!mlbData,\n    spiritualReflection: spiritual.reflection || 'No reflection',\n    gameScore: mlbData.game?.score || 'No game score',\n    todaysDate: mlbData.dateInfo?.today || 'No date',\n    combinedData: {\n      ai: aiData,\n      mlb: mlbData\n    }\n  }\n};\n\nconsole.log('Alternative merge result:', JSON.stringify(result, null, 2));\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "alternative-compiler",
+      "name": "Alternative Compiler"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Dummy AI Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Dummy MLB Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dummy AI Data": {
+      "main": [
+        [
+          {
+            "node": "Set AI Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dummy MLB Data": {
+      "main": [
+        [
+          {
+            "node": "Set MLB Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set AI Data": {
+      "main": [
+        [
+          {
+            "node": "Alternative Compiler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set MLB Data": {
+      "main": [
+        [
+          {
+            "node": "Alternative Compiler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": ["test", "alternative", "no-merge"]
+}

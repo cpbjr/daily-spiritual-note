@@ -1,0 +1,61 @@
+{
+  "name": "Debug Email Compiler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate the data structure from your workflow\nconst testData = {\n  monthDay: '8/26',\n  dayOfWeek: 'Tuesday',\n  today: 'Tuesday, August 26, 2025',\n  theme: 'Stability',\n  saint: {\n    name: 'Daily Weekday',\n    intro: 'Today we focus on living out our baptismal call in ordinary circumstances.'\n  },\n  readings: {\n    firstReading: '1 Thessalonians 2:1-8',\n    psalm: 'Psalm 139:1-3, 4-6',\n    gospel: 'Matthew 23:23-26',\n    season: 'Ordinary Time',\n    usccbLink: 'https://bible.usccb.org/bible/readings/082625.cfm'\n  },\n  mlb: {\n    team: 'Los Angeles Dodgers',\n    record: 'Check mlb.com for current record'\n  }\n};\n\nconsole.log('Test data structure:', JSON.stringify(testData, null, 2));\nreturn testData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "id": "test-data",
+      "name": "Test Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Debug Email Compiler - Check data access\nconst allData = $json;\n\nconsole.log('=== EMAIL COMPILER DEBUG START ===');\nconsole.log('Received allData keys:', Object.keys(allData));\nconsole.log('allData.readings exists:', !!allData.readings);\nconsole.log('allData.readings:', JSON.stringify(allData.readings, null, 2));\n\nif (allData.readings) {\n  console.log('✅ Readings found!');\n  console.log('First Reading:', allData.readings.firstReading);\n  console.log('Psalm:', allData.readings.psalm);\n  console.log('Gospel:', allData.readings.gospel);\n} else {\n  console.log('❌ No readings found in allData');\n  console.log('Available data:', JSON.stringify(allData, null, 2));\n}\n\nconst readingsData = allData.readings || {\n  firstReading: 'FALLBACK: Scripture reading',\n  gospel: 'FALLBACK: Gospel reading',\n  psalm: 'FALLBACK: Psalm'\n};\n\nconsole.log('Final readingsData used:', readingsData);\nconsole.log('=== EMAIL COMPILER DEBUG END ===');\n\n// Simple test output\nreturn {\n  subject: 'Debug Test Email',\n  readingsTest: {\n    firstReading: readingsData.firstReading,\n    psalm: readingsData.psalm,\n    gospel: readingsData.gospel\n  },\n  debugInfo: {\n    hadReadings: !!allData.readings,\n    allDataKeys: Object.keys(allData)\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "id": "debug-compiler",
+      "name": "Debug Compiler"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Test Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Data": {
+      "main": [
+        [
+          {
+            "node": "Debug Compiler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "America/Denver"
+  }
+}

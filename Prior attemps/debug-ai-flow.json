@@ -1,0 +1,79 @@
+{
+  "name": "Debug AI Data Flow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate complete workflow data\nconst fullData = {\n  monthDay: '8/26',\n  dayOfWeek: 'Tuesday',\n  today: 'Tuesday, August 26, 2025',\n  theme: 'Stability',\n  saint: {\n    name: 'Daily Weekday',\n    intro: 'Today we focus on living out our baptismal call in ordinary circumstances.'\n  },\n  readings: {\n    firstReading: '1 Thessalonians 2:1-8',\n    psalm: 'Psalm 139:1-3, 4-6',\n    gospel: 'Matthew 23:23-26',\n    usccbLink: 'https://bible.usccb.org/bible/readings/082625.cfm'\n  }\n};\n\nconsole.log('Workflow data going to AI:', JSON.stringify(fullData, null, 2));\nreturn fullData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "id": "simulate-workflow-data",
+      "name": "Simulate Workflow Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate AI response (what the AI node actually outputs)\nconst inputData = $json;\n\nconsole.log('AI received data:', JSON.stringify(inputData, null, 2));\n\n// This is what the AI node returns - ONLY the AI generated content\nconst aiResponse = {\n  text: JSON.stringify({\n    reflection: 'Today\\'s theme of Stability calls us to ground ourselves in God\\'s unchanging love, just as Paul showed stability in his ministry to the Thessalonians.',\n    challenge: 'Practice lectio divina with today\\'s first reading. Stay present in prayer without rushing.',\n    prayer: 'Lord, like Paul who remained steadfast in his mission, help us find stability in you. Guide us to be authentic witnesses of your love. Amen.',\n    historicalFacts: [\n      {year: '1920', fact: 'The 19th Amendment granting women the right to vote was certified.'},\n      {year: '1978', fact: 'Pope John Paul I was installed as Pope.'}\n    ]\n  })\n};\n\nconsole.log('AI returning:', JSON.stringify(aiResponse, null, 2));\nreturn aiResponse;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "id": "simulate-ai-response",
+      "name": "Simulate AI Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Debug what Email Compiler gets\nconst aiData = $json; // This is the AI response\nconst allInputs = $input.all(); // This should have the workflow data\n\nconsole.log('=== EMAIL COMPILER DEBUG ===');\nconsole.log('AI data:', JSON.stringify(aiData, null, 2));\nconsole.log('Number of inputs:', allInputs.length);\nconsole.log('All inputs:', JSON.stringify(allInputs, null, 2));\n\nif (allInputs.length > 0) {\n  const workflowData = allInputs[0]?.json || {};\n  console.log('❓ Workflow data keys:', Object.keys(workflowData));\n  console.log('❓ Has readings:', !!workflowData.readings);\n  \n  if (workflowData.readings) {\n    console.log('✅ Found readings:', workflowData.readings.firstReading);\n  } else {\n    console.log('❌ No readings found in workflow data');\n  }\n} else {\n  console.log('❌ No inputs available to Email Compiler');\n}\n\nreturn {\n  aiDataExists: !!aiData,\n  inputsCount: allInputs.length,\n  hasWorkflowData: allInputs.length > 0,\n  hasReadings: allInputs.length > 0 && !!allInputs[0]?.json?.readings\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "debug-email-compiler-inputs",
+      "name": "Debug Email Compiler Inputs"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Simulate Workflow Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulate Workflow Data": {
+      "main": [
+        [
+          {
+            "node": "Simulate AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulate AI Response": {
+      "main": [
+        [
+          {
+            "node": "Debug Email Compiler Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false
+}

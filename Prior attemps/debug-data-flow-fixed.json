@@ -1,0 +1,103 @@
+{
+  "name": "Debug Data Flow - Fixed",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate complete workflow data\nconst fullData = {\n  monthDay: '8/27',\n  dayOfWeek: 'Wednesday',\n  today: 'Wednesday, August 27, 2025',\n  theme: 'Listening',\n  saint: {\n    name: 'Monica',\n    intro: 'Mother of St. Augustine, she prayed for her son\\'s conversion for many years.'\n  },\n  readings: {\n    firstReading: '1 Thessalonians 2:9-13',\n    psalm: 'Psalm 139:7-8, 9-10, 11-12ab',\n    gospel: 'Matthew 23:27-32',\n    usccbLink: 'https://bible.usccb.org/bible/readings/082725.cfm'\n  }\n};\n\nconsole.log('Workflow data going to AI:', JSON.stringify(fullData, null, 2));\nreturn [fullData];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "id": "simulate-workflow-data",
+      "name": "Simulate Workflow Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate AI response (what the AI node actually outputs)\nconst inputData = $json;\n\nconsole.log('AI received data:', JSON.stringify(inputData, null, 2));\n\n// This is what the AI node returns - ONLY the AI generated content\nconst aiResponse = {\n  text: JSON.stringify({\n    reflection: 'Today\\'s theme of Listening calls us to cultivate the Benedictine virtue of attentive presence, just as Monica listened deeply to God\\'s will for her son Augustine.',\n    challenge: 'Practice lectio divina with today\\'s first reading. Set aside 15 minutes to truly listen - to Scripture, to God, and to those around you.',\n    prayer: 'Lord, help us listen as Monica listened - with patience, faith, and unwavering hope. Guide us to hear your voice in Scripture and in the quiet moments of this day. Amen.'\n  })\n};\n\nconsole.log('AI returning:', JSON.stringify(aiResponse, null, 2));\nreturn [aiResponse];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "id": "simulate-ai-response",
+      "name": "Simulate AI Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Data Merger - TEST SOLUTION\nconst aiResponse = $json; // AI output (only has 'text' field)\nconst allInputs = $input.all(); // Get all previous data\n\nconsole.log('=== DATA MERGER DEBUG ===');\nconsole.log('AI response:', JSON.stringify(aiResponse, null, 2));\nconsole.log('Number of inputs:', allInputs.length);\nallInputs.forEach((input, i) => {\n  console.log(`Input ${i}:`, Object.keys(input.json || {}));\n});\n\n// Find the workflow data (should be input 0)\nlet workflowData = {};\nif (allInputs.length > 0) {\n  workflowData = allInputs[0]?.json || {};\n  console.log('✅ Found workflow data with keys:', Object.keys(workflowData));\n  console.log('✅ Has readings:', !!workflowData.readings);\n  if (workflowData.readings) {\n    console.log('✅ First Reading:', workflowData.readings.firstReading);\n  }\n} else {\n  console.log('❌ No workflow data found in inputs');\n}\n\n// Parse AI response\nlet aiContent = {};\ntry {\n  const aiText = aiResponse?.text || '';\n  if (aiText) {\n    aiContent = JSON.parse(aiText);\n    console.log('✅ Parsed AI content successfully');\n    console.log('✅ AI reflection:', aiContent.reflection?.substring(0, 50) + '...');\n  }\n} catch (parseError) {\n  console.log('❌ AI parse error:', parseError.message);\n  aiContent = {\n    reflection: 'Fallback reflection for debugging.',\n    challenge: 'Fallback challenge.',\n    prayer: 'Fallback prayer. Amen.'\n  };\n}\n\n// Combine everything\nconst mergedData = {\n  ...workflowData,  // All the original data (date, saint, readings)\n  ai: aiContent     // Add AI content under 'ai' key\n};\n\nconsole.log('✅ Data merger complete. Final keys:', Object.keys(mergedData));\nconsole.log('✅ Final has readings:', !!mergedData.readings);\nconsole.log('✅ Final has AI:', !!mergedData.ai);\n\nif (mergedData.readings) {\n  console.log('✅ Final first reading:', mergedData.readings.firstReading);\n}\nif (mergedData.ai) {\n  console.log('✅ Final AI reflection:', mergedData.ai.reflection?.substring(0, 50) + '...');\n}\n\nreturn [mergedData];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "debug-data-merger",
+      "name": "Debug Data Merger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Test final email output\nconst allData = $json;\n\nconsole.log('=== EMAIL COMPILER TEST ===');\nconsole.log('Data keys:', Object.keys(allData));\nconsole.log('Has readings:', !!allData.readings);\nconsole.log('Has AI:', !!allData.ai);\n\n// Test readings extraction\nif (allData.readings) {\n  console.log('✅ First Reading found:', allData.readings.firstReading);\n  console.log('✅ Gospel found:', allData.readings.gospel);\n} else {\n  console.log('❌ No readings in final data');\n}\n\n// Test AI extraction\nif (allData.ai) {\n  console.log('✅ AI reflection found:', allData.ai.reflection?.substring(0, 50) + '...');\n  console.log('✅ AI challenge found:', allData.ai.challenge?.substring(0, 50) + '...');\n} else {\n  console.log('❌ No AI data in final data');\n}\n\n// Create simplified email\nconst subject = `Daily Summary Test - ${allData.today}`;\nconst body = `\nDAILY SUMMARY - ${allData.today}\nTheme: ${allData.theme}\n\nSaint: ${allData.saint?.name}\n${allData.saint?.intro}\n\nREADINGS:\nFirst Reading: ${allData.readings?.firstReading || 'MISSING'}\nPsalm: ${allData.readings?.psalm || 'MISSING'}\nGospel: ${allData.readings?.gospel || 'MISSING'}\n\nREFLECTION:\n${allData.ai?.reflection || 'MISSING'}\n\nCHALLENGE:\n${allData.ai?.challenge || 'MISSING'}\n\nPRAYER:\n${allData.ai?.prayer || 'MISSING'}\n\n---\nData Flow Test Complete\n`;\n\nconsole.log('✅ Email generated successfully');\nconsole.log('Subject:', subject);\n\nreturn [{\n  subject: subject,\n  body: body,\n  testResults: {\n    hasReadings: !!allData.readings,\n    hasAI: !!allData.ai,\n    readingsFirstReading: allData.readings?.firstReading,\n    aiReflection: allData.ai?.reflection?.substring(0, 100)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "id": "test-email-output",
+      "name": "Test Email Output"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Simulate Workflow Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulate Workflow Data": {
+      "main": [
+        [
+          {
+            "node": "Simulate AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulate AI Response": {
+      "main": [
+        [
+          {
+            "node": "Debug Data Merger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Debug Data Merger": {
+      "main": [
+        [
+          {
+            "node": "Test Email Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "America/Denver"
+  }
+}

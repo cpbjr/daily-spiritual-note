@@ -1,0 +1,61 @@
+{
+  "name": "Debug Readings Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Test current date detection\nconst now = new Date();\nconst mountainTime = new Date(now.toLocaleString(\"en-US\", {timeZone: \"America/Denver\"}));\n\nconst output = {\n  monthDay: `${mountainTime.getMonth() + 1}/${mountainTime.getDate()}`,\n  dayOfWeek: mountainTime.toLocaleDateString('en-US', { weekday: 'long' }),\n  today: mountainTime.toLocaleDateString('en-US', { \n    weekday: 'long', \n    year: 'numeric', \n    month: 'long', \n    day: 'numeric' \n  })\n};\n\nconsole.log('Current Mountain Time date info:', output);\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "id": "date-test",
+      "name": "Date Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Test readings lookup with debug\nconst dateInfo = $json;\n\nconsole.log('=== READINGS DEBUG START ===');\nconsole.log('Input dateInfo:', JSON.stringify(dateInfo, null, 2));\nconsole.log('dateInfo.monthDay:', dateInfo.monthDay);\nconsole.log('typeof dateInfo.monthDay:', typeof dateInfo.monthDay);\n\n// Test readings database\nconst readingsDatabase = {\n  '8/26': { \n    firstReading: '1 Thessalonians 2:1-8', \n    psalm: 'Psalm 139:1-3, 4-6', \n    gospel: 'Matthew 23:23-26', \n    season: 'Ordinary Time' \n  },\n  '8/27': { \n    firstReading: '1 Thessalonians 2:9-13', \n    psalm: 'Psalm 139:7-8, 9-10, 11-12ab', \n    gospel: 'Matthew 23:27-32', \n    season: 'Ordinary Time' \n  }\n};\n\nconst currentDate = dateInfo.monthDay;\nconsole.log('Looking up readings for date:', currentDate);\n\nconst foundReadings = readingsDatabase[currentDate];\nconsole.log('Found readings:', JSON.stringify(foundReadings, null, 2));\n\nif (!foundReadings) {\n  console.log('No readings found! Available dates in database:');\n  console.log(Object.keys(readingsDatabase));\n}\n\nconsole.log('=== READINGS DEBUG END ===');\n\nreturn {\n  ...dateInfo,\n  readings: foundReadings || {\n    firstReading: `NO MATCH for ${currentDate}`,\n    psalm: `Available: ${Object.keys(readingsDatabase).join(', ')}`,\n    gospel: `Debug - dateInfo.monthDay was: '${currentDate}'`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "id": "readings-debug",
+      "name": "Readings Debug"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date Test": {
+      "main": [
+        [
+          {
+            "node": "Readings Debug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "America/Denver"
+  }
+}
