@@ -3,9 +3,9 @@
   "monthDay": "12/13",
   "season": "Advent",
   "readings": {
-    "firstReading": "Isaiah 30:19-21, 23-26",
-    "psalm": "Psalm 147:1-2, 3-4, 5-6",
-    "gospel": "Matthew 9:35-10:1, 5a, 6-8"
+    "firstReading": "Sirach 48:1-4, 9-11",
+    "psalm": "Psalm 80:2ac and 3b, 15-16, 18-19",
+    "gospel": "Matthew 17:9a, 10-13"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/121325.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/12-13.json"

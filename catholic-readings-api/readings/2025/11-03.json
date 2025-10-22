@@ -3,9 +3,9 @@
   "monthDay": "11/3",
   "season": "Ordinary Time",
   "readings": {
-    "firstReading": "Hebrews 11:32-40",
-    "psalm": "Psalm 31:20, 21, 22, 24",
-    "gospel": "Mark 5:1-20"
+    "firstReading": "Romans 11:29-36",
+    "psalm": "Psalm 69:30-31, 33-34, 36",
+    "gospel": "Luke 14:12-14"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/110325.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/11-03.json"

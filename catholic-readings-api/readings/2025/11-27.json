@@ -3,9 +3,10 @@
   "monthDay": "11/27",
   "season": "Ordinary Time",
   "readings": {
-    "firstReading": "Hebrews 12:18-19, 21-24",
-    "psalm": "Psalm 48:2-3ab, 3cd-4, 9, 10-11",
-    "gospel": "Mark 6:7-13"
+    "firstReading": "Sirach 35:12-14, 16-18",
+    "psalm": "Psalm 138:1-2a, 2bc-3, 7c-8",
+    "secondReading": "2 Timothy 4:6-8, 16-18",
+    "gospel": "Luke 18:9-14"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/112725.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/11-27.json"

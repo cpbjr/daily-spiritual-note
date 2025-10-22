@@ -3,9 +3,9 @@
   "monthDay": "10/21",
   "season": "Ordinary Time",
   "readings": {
-    "firstReading": "Romans 6:12-18",
-    "psalm": "Psalm 124:1b-3, 4-6, 7-8",
-    "gospel": "Luke 12:39-48"
+    "firstReading": "Romans 5:12, 15b, 17-19, 20b-21",
+    "psalm": "Psalm 40:7-8a, 8b-9, 10, 17",
+    "gospel": "Luke 12:35-38"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/102125.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/10-21.json"

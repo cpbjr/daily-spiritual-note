@@ -3,9 +3,10 @@
   "monthDay": "10/26",
   "season": "Ordinary Time",
   "readings": {
-    "firstReading": "Romans 8:12-17",
-    "psalm": "Psalm 68:2 and 4, 6-7ab, 20-21",
-    "gospel": "Luke 13:10-17"
+    "firstReading": "Sirach 35:12-14, 16-18",
+    "psalm": "Psalm 34:2-3, 17-18, 19, 23",
+    "secondReading": "2 Timothy 4:6-8, 16-18",
+    "gospel": "Luke 18:9-14"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/102625.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/10-26.json"

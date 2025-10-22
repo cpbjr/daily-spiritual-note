@@ -3,9 +3,9 @@
   "monthDay": "11/5",
   "season": "Ordinary Time",
   "readings": {
-    "firstReading": "Hebrews 12:4-7, 11-15",
-    "psalm": "Psalm 103:1-2, 13-14, 17-18a",
-    "gospel": "Mark 6:1-6"
+    "firstReading": "Romans 13:8-10",
+    "psalm": "Psalm 112:1b-2, 4-5, 9",
+    "gospel": "Luke 14:25-33"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/110525.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/11-05.json"

@@ -1,11 +1,11 @@
 {
   "date": "2025-12-27",
   "monthDay": "12/27",
-  "season": "Advent",
+  "season": "Christmas",
   "readings": {
-    "firstReading": "Isaiah 30:19-21, 23-26",
-    "psalm": "Psalm 147:1-2, 3-4, 5-6",
-    "gospel": "Matthew 9:35-10:1, 5a, 6-8"
+    "firstReading": "1 John 1:1-4",
+    "psalm": "Psalm 97:1-2, 5-6, 11-12",
+    "gospel": "John 20:1a and 2-8"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/122725.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/12-27.json"

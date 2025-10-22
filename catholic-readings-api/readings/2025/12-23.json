@@ -3,9 +3,9 @@
   "monthDay": "12/23",
   "season": "Advent",
   "readings": {
-    "firstReading": "Isaiah 11:1-10",
-    "psalm": "Psalm 72:1-2, 7-8, 12-13, 17",
-    "gospel": "Luke 10:21-24"
+    "firstReading": "Malachi 3:1-4, 23-24",
+    "psalm": "Psalm 25:4-5ab, 8-9, 10 and 14",
+    "gospel": "Luke 1:57-66"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/122325.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/12-23.json"

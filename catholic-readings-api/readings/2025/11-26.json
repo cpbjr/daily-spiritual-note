@@ -3,9 +3,9 @@
   "monthDay": "11/26",
   "season": "Ordinary Time",
   "readings": {
-    "firstReading": "Hebrews 12:4-7, 11-15",
-    "psalm": "Psalm 103:1-2, 13-14, 17-18a",
-    "gospel": "Mark 6:1-6"
+    "firstReading": "Daniel 5:1-6, 13-14, 16-17, 23-28",
+    "psalm": "Daniel 3:62, 63, 64, 65, 66, 67",
+    "gospel": "Luke 21:12-19"
   },
   "usccbLink": "https://bible.usccb.org/bible/readings/112625.cfm",
   "apiEndpoint": "https://cpbjr.github.io/catholic-readings-api/readings/2025/11-26.json"
