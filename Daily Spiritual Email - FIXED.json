@@ -1,0 +1,383 @@
+{
+  "name": "Daily Spiritual Email",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 4
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1120,
+        96
+      ],
+      "id": "1393c925-4bee-454d-a968-ca120e27cfbe",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from the trigger\nconst triggerData = $input.item.json;\n\n// Extract the date components we need\nconst dayOfWeek = triggerData['Day of week'];\nconst year = triggerData.Year;\nconst month = triggerData.Month;\nconst dayOfMonth = triggerData['Day of month'];\n\n// Create readable today format\nconst today = `${dayOfWeek}, ${month} ${parseInt(dayOfMonth)}, ${year}`;\n\n// Create month/day format for database lookups\nconst monthDay = `${new Date(`${month} 1, ${year}`).getMonth() + 1}/${parseInt(dayOfMonth)}`;\n\n// Create API date format (MM-DD) for Catholic Readings API\nconst monthNum = (new Date(`${month} 1, ${year}`).getMonth() + 1).toString().padStart(2, '0');\nconst dayNum = dayOfMonth.padStart(2, '0');\nconst apiDateFormat = `${monthNum}-${dayNum}`;\n\n// Benedictine themes by day of week\nconst themes = {\n  'Sunday': 'Worship & Community',\n  'Monday': 'Humility & Simplicity',\n  'Tuesday': 'Stability',\n  'Wednesday': 'Listening',\n  'Thursday': 'Hospitality & Kindness',\n  'Friday': 'Sacrifice & Repentance',\n  'Saturday': 'Rest & Beauty'\n};\n\n// Create USCCB date format (MMDDYY)\nconst yearShort = year.slice(-2);\nconst usccbDate = `${monthNum}${dayNum}${yearShort}`;\n\nconsole.log(`Processing date: ${today}`);\nconsole.log(`Month/Day format: ${monthDay}`);\nconsole.log(`API format: ${apiDateFormat}`);\nconsole.log(`USCCB format: ${usccbDate}`);\n\nreturn {\n  today: today,\n  dayOfWeek: dayOfWeek,\n  monthDay: monthDay,\n  apiDateFormat: apiDateFormat,\n  theme: themes[dayOfWeek] || 'Prayer',\n  usccbLink: `https://bible.usccb.org/bible/readings/${usccbDate}.cfm`,\n  year: year,\n  month: month,\n  dayOfMonth: dayOfMonth\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        96
+      ],
+      "id": "4a01240e-f0b1-4c13-b93a-51bb3ed356af",
+      "name": "Format Date"
+    },
+    {
+      "parameters": {
+        "url": "=https://cpbjr.github.io/catholic-readings-api/readings/2025/{{ $json.apiDateFormat }}.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        96
+      ],
+      "id": "423a876c-8c34-44da-b6bc-e6a55d60b94d",
+      "name": "Get Readings",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "=https://cpbjr.github.io/catholic-readings-api/saints/2025/{{ $('Format Date').item.json.apiDateFormat }}.json",
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "ae5559c3-b12d-4c5e-9495-4373d91672a5",
+      "name": "Get Saint",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.saint }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Saint Found"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "c2",
+                    "leftValue": "={{ $json.error }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No Saint"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "b5052930-31a3-4d3a-a8d3-61e2943144f2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge readings with saint data - get data from the correct sources\nconst readings = $('Get Readings').first().json;\nconst saints = $input.first().json;\nconst dateInfo = $('Format Date').first().json;\n\nconsole.log('Readings data:', readings);\nconsole.log('Saints data:', saints);\nconsole.log('Date info:', dateInfo);\n\nreturn {\n  ...dateInfo,\n  readings: readings.readings,\n  season: readings.season,\n  usccbLink: readings.usccbLink,\n  saint: saints.saint,\n  hasSaint: true\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ff94b13e-7625-49fc-8d7a-754e5b7fdb39",
+      "name": "Merge with Saint"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Continue with readings only (no saint for today)\nconst readings = $('Get Readings').item.json;\nconst dateInfo = $('Format Date').item.json;\n\nreturn {\n  ...dateInfo,\n  readings: readings.readings,\n  season: readings.season,\n  usccbLink: readings.usccbLink,\n  saint: null,\n  hasSaint: false\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        192
+      ],
+      "id": "cbce9ae3-4c8f-4439-a203-2f5718106db9",
+      "name": "Continue without Saint"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create today's Benedictine daily summary using this data:\n\n**Date & Theme:**\n- Today: {{ $json.today }}\n- Day: {{ $json.dayOfWeek }}\n- Benedictine Theme: {{ $json.theme }}\n\n**Liturgical Information:**\n- Season: {{ $json.season }}\n- First Reading: {{ $json.readings.firstReading }}\n- Psalm: {{ $json.readings.psalm }}\n{{ $json.readings.secondReading ? '- Second Reading: ' + $json.readings.secondReading : '' }}\n- Gospel: {{ $json.readings.gospel }}\n- USCCB Link: {{ $json.usccbLink }}\n\n**Celebration Information:**\n- Has Celebration Today: {{ $json.hasSaint }}\n{{ $json.saint ? '- Celebration: ' + $json.saint.name + ' (' + $json.saint.type + ')' : '' }}\n{{ $json.saint ? '- Quote: \"' + $json.saint.quote + '\"' : '' }}\n{{ $json.saint ? '- Description: ' + $json.saint.description : '' }}\n{{ $json.saint ? '- Celebration Type: ' + $json.saint.type : '' }}\n\nGenerate the spiritual reflection following the structured format, integrating the Benedictine theme with today's readings and celebration (if present). Include a practical spiritual challenge related to {{ $json.theme }}.",
+        "options": {
+          "systemMessage": "You are a Catholic spiritual director creating daily reflections. You MUST return valid JSON (not JavaScript object syntax). Your response must be a properly formatted JSON string with double quotes around all keys and string values.\n\nReturn exactly this JSON structure:\n{\n  \"spiritualFocus\": \"brief focus for spiritual growth\",\n  \"liturgicalReadings\": \"insight about today's readings\",\n  \"celebrationName\": \"celebration name or null\",\n  \"celebrationType\": \"Saint|Feast|Memorial|Solemnity|Optional Memorial|null\",\n  \"celebrationContent\": \"content appropriate to celebration type or null\",\n  \"celebrationLink\": \"Wikipedia or relevant URL or null\",\n  \"sectionTitle\": \"appropriate section title or null\",\n  \"reflection\": \"spiritual reflection on today's theme and readings\",\n  \"practicalChallenge\": \"practical action for today\",\n  \"prayer\": \"short prayer for the day\"\n}\n\nFor celebration handling:\n\nIF CELEBRATION TYPE IS SAINT (personal feast days):\n- celebrationName: Saint's name and title (e.g., \"St. Peter Claver, Jesuit missionary\")\n- celebrationType: \"Saint\"\n- celebrationContent: 2-3 sentence biography of their life and significance\n- celebrationLink: Wikipedia URL for the saint (e.g., \"https://en.wikipedia.org/wiki/Peter_Claver\")\n- sectionTitle: \"Saint of the Day\"\n\nIF CELEBRATION TYPE IS FEAST/SOLEMNITY (liturgical celebrations):\n- celebrationName: Exact celebration name (e.g., \"Exaltation of the Holy Cross\")\n- celebrationType: The type from input (\"Feast\", \"Solemnity\", etc.)\n- celebrationContent: 2-3 sentence theological explanation of the celebration's significance\n- celebrationLink: Relevant Wikipedia or Catholic resource URL\n- sectionTitle: \"Liturgical Celebration\"\n\nIF NO CELEBRATION (ordinary days):\n- celebrationName: null\n- celebrationType: null\n- celebrationContent: null\n- celebrationLink: null\n- sectionTitle: null\n\nIMPORTANT: Use only double quotes, no single quotes. No unquoted keys. No trailing commas. Valid JSON only."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        96
+      ],
+      "id": "e5f5b609-1602-4c9f-a850-db0ee0a2460c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI Agent JSON output\nconst rawOutput = $input.first().json.output;\n\n// Clean and parse the JSON\nlet cleanedOutput = rawOutput.replace(/\\\\n/g, ' ');\nlet parsedOutput;\n\ntry {\n  parsedOutput = JSON.parse(cleanedOutput);\n} catch (error) {\n  return {\n    error: 'JSON parsing failed',\n    rawOutput: rawOutput,\n    errorMessage: error.message\n  };\n}\n\n// Return clean fields with new celebration structure\nreturn {\n  spiritualFocus: parsedOutput.spiritualFocus || 'No spiritual focus available',\n  liturgicalReadings: parsedOutput.liturgicalReadings || 'No liturgical readings available',\n  celebrationName: parsedOutput.celebrationName || null,\n  celebrationType: parsedOutput.celebrationType || null,\n  celebrationContent: parsedOutput.celebrationContent || null,\n  celebrationLink: parsedOutput.celebrationLink || null,\n  sectionTitle: parsedOutput.sectionTitle || null,\n  reflection: parsedOutput.reflection || 'No reflection available',\n  practicalChallenge: parsedOutput.practicalChallenge || 'No practical challenge available',\n  prayer: parsedOutput.prayer || 'No prayer available'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        96
+      ],
+      "id": "fd644f22-3ea1-4c0b-ab4f-6790013672c9",
+      "name": "Parse AI Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get parsed AI data and other node data\nconst spiritualFocus = $input.first().json.spiritualFocus;\nconst liturgicalReadings = $input.first().json.liturgicalReadings;\nconst celebrationName = $input.first().json.celebrationName;\nconst celebrationType = $input.first().json.celebrationType;\nconst celebrationContent = $input.first().json.celebrationContent;\nconst celebrationLink = $input.first().json.celebrationLink;\nconst sectionTitle = $input.first().json.sectionTitle;\nconst reflection = $input.first().json.reflection;\nconst practicalChallenge = $input.first().json.practicalChallenge;\nconst prayer = $input.first().json.prayer;\n\nconst dateInfo = $('Format Date').first().json;\nconst readingsData = $('Get Readings').first().json;\n\n// Calculate liturgical calendar day\nconst today = new Date();\nconst dayOfWeek = today.getDay();\nconst weekNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];\nconst dayName = weekNames[dayOfWeek];\n\n// Helper function for ordinal numbers\nfunction getOrdinalNumber(n) {\n  const ordinals = ['', 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth',\n    'Eleventh', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth', 'Sixteenth', 'Seventeenth', 'Eighteenth', \n    'Nineteenth', 'Twentieth', 'Twenty-first', 'Twenty-second', 'Twenty-third', 'Twenty-fourth', 'Twenty-fifth',\n    'Twenty-sixth', 'Twenty-seventh', 'Twenty-eighth', 'Twenty-ninth', 'Thirtieth', 'Thirty-first', 'Thirty-second', 'Thirty-third', 'Thirty-fourth'];\n  return ordinals[n] || (n + 'th');\n}\n\n// Simple liturgical week calculation\nconst startOfYear = new Date(today.getFullYear(), 0, 1);\nconst dayOfYear = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000));\nconst weekOfYear = Math.floor(dayOfYear / 7) + 1;\n\n// During Ordinary Time (rough approximation)\nlet liturgicalDay = '';\nif (weekOfYear >= 6 && weekOfYear <= 32) {\n  const ordinaryWeekNum = Math.floor((weekOfYear - 5));\n  liturgicalDay = `${dayName} of the ${getOrdinalNumber(ordinaryWeekNum)} Week in Ordinary Time`;\n} else {\n  liturgicalDay = `${dayName} in ${readingsData.season}`;\n}\n\n// Build second reading line\nconst secondReadingLine = readingsData.readings.secondReading ?\n  '<strong>Second Reading:</strong> ' + readingsData.readings.secondReading + '<br>' : '';\n\n// Handle celebration section with dynamic title and content based on type\nconst celebrationSection = celebrationName ?\n  '<div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">' + sectionTitle + '</h3><h4 style=\"color: #34495e; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;\">' + celebrationName + '</h4><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-bottom: 15px;\">' + celebrationContent + '</p>' + (celebrationLink ? '<p><a href=\"' + celebrationLink + '\" style=\"color: #3498db; text-decoration: none;\">Learn more →</a></p>' : '') + '</div>' : '';\n\n// Build HTML content with perfected layout\nconst htmlContent = '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Daily Benedictine Reflection</title></head><body style=\"margin: 0; padding: 0; font-family: Georgia, Times New Roman, serif; background-color: #f8f9fa; color: #2c3e50;\"><div style=\"max-width: 800px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);\"><div style=\"background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); color: white; padding: 40px 20px; text-align: center;\"><h1 style=\"margin: 0; font-size: 2.5em; font-weight: normal; letter-spacing: 2px;\">Daily Benedictine Reflection</h1></div><div style=\"background-color: #ecf0f1; padding: 20px; text-align: center; border-bottom: 1px solid #bdc3c7;\"><div style=\"display: inline-flex; align-items: center; gap: 30px;\"><span style=\"color: #34495e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;\">' + liturgicalDay + '</span></div></div><div style=\"padding: 40px;\"><div style=\"text-align: center; margin-bottom: 40px;\"><div style=\"width: 60px; height: 3px; background-color: #3498db; margin: 20px auto;\"></div></div><div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Today\\'s Readings</h3><div style=\"margin-bottom: 15px;\"><strong>First Reading:</strong> ' + readingsData.readings.firstReading + '<br><strong>Psalm:</strong> ' + readingsData.readings.psalm + '<br>' + secondReadingLine + '<strong>Gospel:</strong> ' + readingsData.readings.gospel + '</div><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-top: 20px;\">' + liturgicalReadings + '</p></div><div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Today\\'s Focus: ' + dateInfo.theme + '</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e;\">' + spiritualFocus + '</p></div>' + celebrationSection + '<div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Reflection & Challenge</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e;\">' + reflection + '</p><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-top: 20px;\"><strong style=\"font-weight: bold; color: #2980b9;\">Practical Spiritual Challenge:</strong> ' + practicalChallenge + '</p></div><div style=\"background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%); padding: 30px; border-radius: 8px; text-align: center; border: 1px solid #bdc3c7;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Daily Prayer</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; font-style: italic;\">' + prayer + '</p></div></div><div style=\"background-color: #34495e; color: #ecf0f1; padding: 30px; text-align: center;\"><p style=\"margin: 0; font-size: 14px;\">Ora et Labora<br><a href=\"' + readingsData.usccbLink + '\" style=\"color: #3498db; text-decoration: none;\">View Today\\'s Official Readings</a></p></div></div></body></html>';\n\nreturn {\n  htmlContent: htmlContent,\n  subject: 'Daily Benedictine Reflection - ' + dateInfo.today\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        96
+      ],
+      "id": "b58f6454-8c41-487c-b09b-6a0ec0bc4038",
+      "name": "Build HTML"
+    },
+    {
+      "parameters": {
+        "fromEmail": "christopher.bisgaard@gmail.com",
+        "toEmail": "cpbjr@mac.com",
+        "subject": "=Daily Spiritual Email for  {{ $('Format Date').item.json.today }}",
+        "html": "={{ $json.htmlContent }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1008,
+        96
+      ],
+      "id": "e10b31dc-1435-4a11-838f-fdd4b48bae8b",
+      "name": "Send email",
+      "webhookId": "b3d13b5f-2b52-461f-a038-74d1362f63d6",
+      "credentials": {
+        "smtp": {
+          "id": "t5muBt48UrDocNe8",
+          "name": "Google SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "x-ai/grok-4",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        224,
+        288
+      ],
+      "id": "4d304593-c070-49f4-9551-0f48f2c1abdd",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "YxHKEc4tsQR19kOm",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Date": {
+      "main": [
+        [
+          {
+            "node": "Get Readings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Readings": {
+      "main": [
+        [
+          {
+            "node": "Get Saint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Saint": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Merge with Saint",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Continue without Saint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge with Saint": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Continue without Saint": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Output": {
+      "main": [
+        [
+          {
+            "node": "Build HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build HTML": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "L6JSjNVeNWnq6tG9",
+      "name": "enhanced-celebrations"
+    }
+  ]
+}
