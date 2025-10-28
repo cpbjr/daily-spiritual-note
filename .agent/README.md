@@ -1,8 +1,8 @@
 # Daily Summary Project Documentation
 
-**Status**: Active (Production)
-**Priority**: 5
-**Last Updated**: 2025-10-13
+**Status**: ✅ IN PRODUCTION (Stable)
+**Priority**: 5 (Maintenance Only)
+**Last Updated**: 2025-10-27
 
 ## Project Overview
 
@@ -10,47 +10,80 @@ Daily Catholic readings delivery with AI-generated spiritual content.
 
 ## Status
 
-⚠️ **BROKEN** - Switch node routing failure (discovered 2025-10-13)
-🔧 **Fix Ready** - Awaiting implementation (2-minute UI fix)
+✅ **IN PRODUCTION (STABLE)** - All features deployed and verified working
+🚀 **Active** - Workflow running daily at 4:00 AM EST
+📧 **Delivering** - Daily emails with readings, reflections, and historical events
+🔧 **Maintenance Mode** - No active development, monitoring only
 
 ## Tech Stack
 
 - **n8n workflows** - AI Agent + Code Tool architecture
 - **Token-efficient design** - <1000 tokens (vs 15k alternative)
 - **Liturgical data** - GitHub Pages API for readings
-- **Production Server** - AWS EC2 at http://3.16.157.215:5678
+- **Production Server** - https://n8n.whitepine-tech.com
+- **n8n API Key** - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMDgxMTM3OC0wYjViLTRhZGQtOTkwMi01OTJiZTIwOTZkMjEiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYxNDI2ODAxfQ.vAhvKbvpGFTlYbmnOCs3TLIgAe5cLeR4aPviF7Wc2q4
+
+## 📚 Universal n8n Patterns
+
+For patterns that apply to ALL n8n projects, see workspace SOPs:
+- [n8n-mcp-first-development.md](../../.agent/SOPs/n8n-mcp-first-development.md) - MCP-first methodology (MANDATORY)
+- [n8n-switch-node-routing-patterns.md](../../.agent/SOPs/n8n-switch-node-routing-patterns.md) - Switch vs IF routing (includes Catholic API pattern)
+- [n8n-workflow-modification-checklist.md](../../.agent/SOPs/n8n-workflow-modification-checklist.md) - How to modify workflows
+- [n8n-debugging-strategies.md](../../.agent/SOPs/n8n-debugging-strategies.md) - Debugging techniques
+- [n8n-deployment-checklist.md](../../.agent/SOPs/n8n-deployment-checklist.md) - Deployment procedures
+
+**Project-specific SOPs** (unique to Daily Summary):
+- [switch-node-configuration.md](SOPs/switch-node-configuration.md) - Catholic API error handling (consolidated into workspace SOP)
+- [deployment-procedure.md](SOPs/deployment-procedure.md) - Spiritual email deployment
 
 ## Documentation Structure
 
 ### System/ (Current State)
-- **[current-issue.md](System/current-issue.md)** - Switch node routing failure (ACTIVE ISSUE)
+- **[current-issue.md](System/current-issue.md)** - Switch node routing failure (RESOLVED)
 - **[workflow-error-handling.md](System/workflow-error-handling.md)** - Error handling configuration (outdated, needs revision)
 
 ### SOPs/ (How-To Procedures)
-- *Empty* - To be populated with operational procedures
+- **[deployment-procedure.md](SOPs/deployment-procedure.md)** - Full deployment guide
+- **[switch-node-configuration.md](SOPs/switch-node-configuration.md)** - Switch node operator reference
 
 ### Tasks/ (Active Work)
-- **[START-HERE.md](Tasks/START-HERE.md)** - Current task: Fix Switch node (estimated 2 minutes)
+- **[current-sprint.md](Tasks/current-sprint.md)** - Project status and completed tasks
 
 ### Root Level (Project Directory)
-- **[Daily Spiritual Email - FIXED.json](../Daily%20Spiritual%20Email%20-%20FIXED.json)** - Corrected workflow ready to import
+- **[Daily Spiritual Email.json](../Daily%20Spiritual%20Email.json)** - Production workflow (all features deployed)
 - **[PRD.md](../PRD.md)** - Complete project requirements and architecture
 - **[catholic-readings-api/](../catholic-readings-api/)** - GitHub Pages API source code
 - **[Documentation/Archive/](../Documentation/Archive/)** - Old workflow versions and task files
 
 ## Recent Changes
 
+### October 27, 2025 - Historical Events Feature Deployed to Production ✅
+**Action:** Implemented and deployed "Today in History" section
+**Production Workflow:** `Daily Spiritual Email` on n8n.whitepine-tech.com
+**Feature:** Three historical events per day (one required from 1972 or 1992, two from diverse years)
+**Implementation:** AI-generated content using Grok-4's historical knowledge, no external APIs
+**Token Impact:** ~350 token increase per execution (~1,150 total, still highly efficient)
+**Status:** ✅ VERIFIED WORKING IN PRODUCTION
+**Test Workflow Archived:** `Documentation/Archive/Daily Spiritual Email-historical-20251027.json`
+
+### October 26, 2025 - Switch Node Fix Deployed ✅
+**Action:** Deployed corrected workflow to production server
+**Method:** Full workflow update via n8n API
+**Root Cause:** `typeValidation: "strict"` rejected empty strings when checking `$json.saint`
+**Solution:** Changed both Switch conditions to `typeValidation: "loose"`
+**Verification:** Configuration confirmed deployed, email delivery verified
+**Status:** ✅ RESOLVED - Workflow operating normally
+
 ### October 13, 2025 - Switch Node Routing Failure Discovered
 **Issue:** Workflow stops at Switch node when saint data unavailable (404 response)
 **Root Cause:** Switch checks `$json.saint.name` and `$json.data`, but API returns `$json.error`
-**Status:** Fix identified, awaiting implementation
-**Next Action:** Apply 2-minute UI fix (see Tasks/START-HERE.md)
+**Status:** ✅ **RESOLVED**
 
-See [System/current-issue.md](System/current-issue.md) for complete technical analysis.
+See [System/current-issue.md](System/current-issue.md) for complete technical analysis and deployment details.
 
 ## Quick Reference
 
-**Production Workflow ID:** `XOsIARJl8r1E7SWJ`
+**Production Workflow ID:** `h2DLuz8HuZKuLZhq`
 **Schedule:** 4:00 AM EST daily
 **Email Delivery:** christopher.bisgaard@gmail.com → cpbjr@mac.com
 **API Endpoint:** https://cpbjr.github.io/catholic-readings-api/
