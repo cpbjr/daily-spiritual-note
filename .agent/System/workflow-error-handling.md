@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-10-13
 **Status:** Fixed and Deployed
-**Production Workflow ID:** XOsIARJl8r1E7SWJ
+**Production Workflow ID:** h2DLuz8HuZKuLZhq
 
 ---
 
@@ -187,9 +187,9 @@ Get Saint → Switch Node
 
 ## Production Configuration Details
 
-**Deployment Location:** AWS EC2
-**Server URL:** http://3.16.157.215:5678
-**Workflow ID:** XOsIARJl8r1E7SWJ
+**Deployment Location:** Whitepine Tech n8n server
+**Server URL:** https://n8n.whitepine-tech.com
+**Workflow ID:** h2DLuz8HuZKuLZhq
 **File Location:** `/home/cpbjr/Documents/AI_Automation/Projects/Daily Summary/Daily Spiritual Email.json`
 
 **Schedule:**
@@ -216,7 +216,7 @@ Get Saint → Switch Node
 - Content accuracy matches USCCB.org
 
 ### Weekly Validation
-- Check execution history: http://3.16.157.215:5678/workflow/XOsIARJl8r1E7SWJ/executions
+- Check execution history: https://n8n.whitepine-tech.com/workflow/h2DLuz8HuZKuLZhq/executions
 - Verify saint data appears on feast days
 - Confirm readings data is current
 
