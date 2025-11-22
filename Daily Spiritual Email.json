@@ -17,7 +17,8 @@
         -1120,
         96
       ],
-      "name": "Schedule Trigger"
+      "name": "Schedule Trigger",
+      "id": "94404da2-f8f1-4fdf-aacf-4cea4345d54f"
     },
     {
       "parameters": {
@@ -29,7 +30,8 @@
         -896,
         96
       ],
-      "name": "Format Date"
+      "name": "Format Date",
+      "id": "a8397721-f7fc-41ac-8249-5a69fe238ad1"
     },
     {
       "parameters": {
@@ -43,6 +45,7 @@
         96
       ],
       "name": "Get Readings",
+      "id": "37575d84-12a2-4e5d-bd61-95ee89e412c5",
       "continueOnFail": true
     },
     {
@@ -59,6 +62,7 @@
         96
       ],
       "name": "Get Saint",
+      "id": "db732bae-9511-43f6-bef7-9ae2c0e4388d",
       "continueOnFail": true
     },
     {
@@ -125,7 +129,8 @@
         -224,
         96
       ],
-      "name": "Switch"
+      "name": "Switch",
+      "id": "28e7c6d3-0c42-4ac2-9314-078e91765c77"
     },
     {
       "parameters": {
@@ -137,7 +142,8 @@
         0,
         0
       ],
-      "name": "Merge with Saint"
+      "name": "Merge with Saint",
+      "id": "0a5e0913-56a7-4a8c-86c9-8235c18150fe"
     },
     {
       "parameters": {
@@ -149,14 +155,15 @@
         0,
         192
       ],
-      "name": "Continue without Saint"
+      "name": "Continue without Saint",
+      "id": "99f86531-4c7c-45f4-b4cf-fb4cbac87381"
     },
     {
       "parameters": {
         "promptType": "define",
         "text": "=Create today's Benedictine daily summary using this data:\n\n**Date & Theme:**\n- Today: {{ $json.today }}\n- Day: {{ $json.dayOfWeek }}\n- Benedictine Theme: {{ $json.theme }}\n\n**Liturgical Information:**\n- Season: {{ $json.season }}\n- First Reading: {{ $json.readings.firstReading }}\n- Psalm: {{ $json.readings.psalm }}\n{{ $json.readings.secondReading ? '- Second Reading: ' + $json.readings.secondReading : '' }}\n- Gospel: {{ $json.readings.gospel }}\n- USCCB Link: {{ $json.usccbLink }}\n\n**Celebration Information:**\n- Has Celebration Today: {{ $json.hasSaint }}\n{{ $json.saint ? '- Celebration: ' + $json.saint.name + ' (' + $json.saint.type + ')' : '' }}\n{{ $json.saint ? '- Quote: \"' + $json.saint.quote + '\"' : '' }}\n{{ $json.saint ? '- Description: ' + $json.saint.description : '' }}\n{{ $json.saint ? '- Celebration Type: ' + $json.saint.type : '' }}\n\nGenerate the spiritual reflection following the structured format, integrating the Benedictine theme with today's readings and celebration (if present). Include a practical spiritual challenge related to {{ $json.theme }}.",
         "options": {
-          "systemMessage": "You are a Catholic spiritual director creating daily reflections. You MUST return valid JSON (not JavaScript object syntax). Your response must be a properly formatted JSON string with double quotes around all keys and string values.\n\nReturn exactly this JSON structure:\n{\n  \"spiritualFocus\": \"brief focus for spiritual growth\",\n  \"liturgicalReadings\": \"insight about today's readings\",\n  \"celebrationName\": \"celebration name or null\",\n  \"celebrationType\": \"Saint|Feast|Memorial|Solemnity|Optional Memorial|null\",\n  \"celebrationContent\": \"content appropriate to celebration type or null\",\n  \"celebrationLink\": \"Wikipedia or relevant URL or null\",\n  \"sectionTitle\": \"appropriate section title or null\",\n  \"reflection\": \"spiritual reflection on today's theme and readings\",\n  \"practicalChallenge\": \"practical action for today\",\n  \"prayer\": \"short prayer for the day\"\n}\n\nFor celebration handling:\n\nIF CELEBRATION TYPE IS SAINT (personal feast days):\n- celebrationName: Saint's name and title (e.g., \"St. Peter Claver, Jesuit missionary\")\n- celebrationType: \"Saint\"\n- celebrationContent: 2-3 sentence biography of their life and significance\n- celebrationLink: Wikipedia URL for the saint (e.g., \"https://en.wikipedia.org/wiki/Peter_Claver\")\n- sectionTitle: \"Saint of the Day\"\n\nIF CELEBRATION TYPE IS FEAST/SOLEMNITY (liturgical celebrations):\n- celebrationName: Exact celebration name (e.g., \"Exaltation of the Holy Cross\")\n- celebrationType: The type from input (\"Feast\", \"Solemnity\", etc.)\n- celebrationContent: 2-3 sentence theological explanation of the celebration's significance\n- celebrationLink: Relevant Wikipedia or Catholic resource URL\n- sectionTitle: \"Liturgical Celebration\"\n\nIF NO CELEBRATION (ordinary days):\n- celebrationName: null\n- celebrationType: null\n- celebrationContent: null\n- celebrationLink: null\n- sectionTitle: null\n\nIMPORTANT: Use only double quotes, no single quotes. No unquoted keys. No trailing commas. Valid JSON only."
+          "systemMessage": "You are a Catholic spiritual director creating daily reflections. You MUST return valid JSON (not JavaScript object syntax). Your response must be a properly formatted JSON string with double quotes around all keys and string values.\n\nReturn exactly this JSON structure:\n{\n  \"spiritualFocus\": \"brief focus for spiritual growth\",\n  \"liturgicalReadings\": \"insight about today's readings with particular focus on historical context of the scriptures\",\n  \"celebrationName\": \"celebration name or null\",\n  \"celebrationType\": \"Saint|Feast|Memorial|Solemnity|Optional Memorial|null\",\n  \"celebrationContent\": \"content appropriate to celebration type or null\",\n  \"celebrationLink\": \"Wikipedia or relevant URL or null\",\n  \"sectionTitle\": \"appropriate section title or null\",\n  \"reflection\": \"8-11 sentence spiritual reflection on today's theme and readings\",\n  \"practicalChallenge\": \"practical action for today\",\n  \"prayer\": \"short prayer for the day\"\n}\n\nFor celebration handling:\n\nIF CELEBRATION TYPE IS SAINT (personal feast days):\n- celebrationName: Saint's name and title (e.g., \"St. Peter Claver, Jesuit missionary\")\n- celebrationType: \"Saint\"\n- celebrationContent: 2-3 sentence biography of their life and significance\n- celebrationLink: Wikipedia URL for the saint (e.g., \"https://en.wikipedia.org/wiki/Peter_Claver\")\n- sectionTitle: \"Saint of the Day\"\n\nIF CELEBRATION TYPE IS FEAST/SOLEMNITY (liturgical celebrations):\n- celebrationName: Exact celebration name (e.g., \"Exaltation of the Holy Cross\")\n- celebrationType: The type from input (\"Feast\", \"Solemnity\", etc.)\n- celebrationContent: 2-3 sentence theological explanation of the celebration's significance\n- celebrationLink: Relevant Wikipedia or Catholic resource URL\n- sectionTitle: \"Liturgical Celebration\"\n\nIF NO CELEBRATION (ordinary days):\n- celebrationName: null\n- celebrationType: null\n- celebrationContent: null\n- celebrationLink: null\n- sectionTitle: null\n\nIMPORTANT: Use only double quotes, no single quotes. No unquoted keys. No trailing commas. Valid JSON only."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -165,7 +172,8 @@
         224,
         96
       ],
-      "name": "AI Agent"
+      "name": "AI Agent",
+      "id": "3f254ff5-3a21-4751-9d5b-1bece9f2b250"
     },
     {
       "parameters": {
@@ -177,11 +185,12 @@
         576,
         96
       ],
-      "name": "Parse AI Output"
+      "name": "Parse AI Output",
+      "id": "47dc6629-6c59-4b8e-8017-3fe5e3fc64f7"
     },
     {
       "parameters": {
-        "jsCode": "// Get parsed AI data and other node data\nconst spiritualFocus = $input.first().json.spiritualFocus;\nconst liturgicalReadings = $input.first().json.liturgicalReadings;\nconst celebrationName = $input.first().json.celebrationName;\nconst celebrationType = $input.first().json.celebrationType;\nconst celebrationContent = $input.first().json.celebrationContent;\nconst celebrationLink = $input.first().json.celebrationLink;\nconst sectionTitle = $input.first().json.sectionTitle;\nconst reflection = $input.first().json.reflection;\nconst practicalChallenge = $input.first().json.practicalChallenge;\nconst prayer = $input.first().json.prayer;\n\nconst dateInfo = $('Format Date').first().json;\nconst readingsData = $('Get Readings').first().json;\n\n// Calculate liturgical calendar day\nconst today = new Date();\nconst dayOfWeek = today.getDay();\nconst weekNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];\nconst dayName = weekNames[dayOfWeek];\n\n// Helper function for ordinal numbers\nfunction getOrdinalNumber(n) {\n  const ordinals = ['', 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth',\n    'Eleventh', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth', 'Sixteenth', 'Seventeenth', 'Eighteenth', \n    'Nineteenth', 'Twentieth', 'Twenty-first', 'Twenty-second', 'Twenty-third', 'Twenty-fourth', 'Twenty-fifth',\n    'Twenty-sixth', 'Twenty-seventh', 'Twenty-eighth', 'Twenty-ninth', 'Thirtieth', 'Thirty-first', 'Thirty-second', 'Thirty-third', 'Thirty-fourth'];\n  return ordinals[n] || (n + 'th');\n}\n\n// Simple liturgical week calculation\nconst startOfYear = new Date(today.getFullYear(), 0, 1);\nconst dayOfYear = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000));\nconst weekOfYear = Math.floor(dayOfYear / 7) + 1;\n\n// During Ordinary Time (rough approximation)\nlet liturgicalDay = '';\nif (weekOfYear >= 6 && weekOfYear <= 32) {\n  const ordinaryWeekNum = Math.floor((weekOfYear - 5));\n  liturgicalDay = `${dayName} of the ${getOrdinalNumber(ordinaryWeekNum)} Week in Ordinary Time`;\n} else {\n  liturgicalDay = `${dayName} in ${readingsData.season}`;\n}\n\n// Build second reading line\nconst secondReadingLine = readingsData.readings.secondReading ?\n  '<strong>Second Reading:</strong> ' + readingsData.readings.secondReading + '<br>' : '';\n\n// Handle celebration section with dynamic title and content based on type\nconst celebrationSection = celebrationName ?\n  '<div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">' + sectionTitle + '</h3><h4 style=\"color: #34495e; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;\">' + celebrationName + '</h4><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-bottom: 15px;\">' + celebrationContent + '</p>' + (celebrationLink ? '<p><a href=\"' + celebrationLink + '\" style=\"color: #3498db; text-decoration: none;\">Learn more \u2192</a></p>' : '') + '</div>' : '';\n\n// Build HTML content with perfected layout\nconst htmlContent = '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Daily Benedictine Reflection</title></head><body style=\"margin: 0; padding: 0; font-family: Georgia, Times New Roman, serif; background-color: #f8f9fa; color: #2c3e50;\"><div style=\"max-width: 800px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);\"><div style=\"background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); color: white; padding: 40px 20px; text-align: center;\"><h1 style=\"margin: 0; font-size: 2.5em; font-weight: normal; letter-spacing: 2px;\">Daily Benedictine Reflection</h1></div><div style=\"background-color: #ecf0f1; padding: 20px; text-align: center; border-bottom: 1px solid #bdc3c7;\"><div style=\"display: inline-flex; align-items: center; gap: 30px;\"><span style=\"color: #34495e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;\">' + liturgicalDay + '</span></div></div><div style=\"padding: 40px;\"><div style=\"text-align: center; margin-bottom: 40px;\"><div style=\"width: 60px; height: 3px; background-color: #3498db; margin: 20px auto;\"></div></div><div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Today\\'s Readings</h3><div style=\"margin-bottom: 15px;\"><strong>First Reading:</strong> ' + readingsData.readings.firstReading + '<br><strong>Psalm:</strong> ' + readingsData.readings.psalm + '<br>' + secondReadingLine + '<strong>Gospel:</strong> ' + readingsData.readings.gospel + '</div><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-top: 20px;\">' + liturgicalReadings + '</p></div><div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Today\\'s Focus: ' + dateInfo.theme + '</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e;\">' + spiritualFocus + '</p></div>' + celebrationSection + '<div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Reflection & Challenge</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e;\">' + reflection + '</p><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-top: 20px;\"><strong style=\"font-weight: bold; color: #2980b9;\">Practical Spiritual Challenge:</strong> ' + practicalChallenge + '</p></div><div style=\"background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%); padding: 30px; border-radius: 8px; text-align: center; border: 1px solid #bdc3c7;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Daily Prayer</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; font-style: italic;\">' + prayer + '</p></div></div><div style=\"background-color: #34495e; color: #ecf0f1; padding: 30px; text-align: center;\"><p style=\"margin: 0; font-size: 14px;\">Ora et Labora<br><a href=\"' + readingsData.usccbLink + '\" style=\"color: #3498db; text-decoration: none;\">View Today\\'s Official Readings</a></p></div></div></body></html>';\n\nreturn {\n  htmlContent: htmlContent,\n  subject: 'Daily Benedictine Reflection - ' + dateInfo.today\n};"
+        "jsCode": "// Get parsed AI data and other node data\nconst spiritualFocus = $input.first().json.spiritualFocus;\nconst liturgicalReadings = $input.first().json.liturgicalReadings;\nconst celebrationName = $input.first().json.celebrationName;\nconst celebrationType = $input.first().json.celebrationType;\nconst celebrationContent = $input.first().json.celebrationContent;\nconst celebrationLink = $input.first().json.celebrationLink;\nconst sectionTitle = $input.first().json.sectionTitle;\nconst reflection = $input.first().json.reflection;\nconst practicalChallenge = $input.first().json.practicalChallenge;\nconst prayer = $input.first().json.prayer;\n\nconst dateInfo = $('Format Date').first().json;\nconst readingsData = $('Get Readings').first().json;\n\n// Calculate liturgical calendar day\nconst today = new Date();\nconst dayOfWeek = today.getDay();\nconst weekNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];\nconst dayName = weekNames[dayOfWeek];\n\n// Helper function for ordinal numbers\nfunction getOrdinalNumber(n) {\n  const ordinals = ['', 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth',\n    'Eleventh', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth', 'Sixteenth', 'Seventeenth', 'Eighteenth', \n    'Nineteenth', 'Twentieth', 'Twenty-first', 'Twenty-second', 'Twenty-third', 'Twenty-fourth', 'Twenty-fifth',\n    'Twenty-sixth', 'Twenty-seventh', 'Twenty-eighth', 'Twenty-ninth', 'Thirtieth', 'Thirty-first', 'Thirty-second', 'Thirty-third', 'Thirty-fourth'];\n  return ordinals[n] || (n + 'th');\n}\n\n// Simple liturgical week calculation\nconst startOfYear = new Date(today.getFullYear(), 0, 1);\nconst dayOfYear = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000));\nconst weekOfYear = Math.floor(dayOfYear / 7) + 1;\n\n// During Ordinary Time (rough approximation)\nlet liturgicalDay = '';\nif (weekOfYear >= 6 && weekOfYear <= 32) {\n  const ordinaryWeekNum = Math.floor((weekOfYear - 5));\n  liturgicalDay = `${dayName} of the ${getOrdinalNumber(ordinaryWeekNum)} Week in Ordinary Time`;\n} else {\n  liturgicalDay = `${dayName} in ${readingsData.season}`;\n}\n\n// Build second reading line\nconst secondReadingLine = readingsData.readings.secondReading ?\n  '<strong>Second Reading:</strong> ' + readingsData.readings.secondReading + '<br>' : '';\n\n// Handle celebration section with dynamic title and content based on type\nconst celebrationSection = celebrationName ?\n  '<div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">' + sectionTitle + '</h3><h4 style=\"color: #34495e; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;\">' + celebrationName + '</h4><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-bottom: 15px;\">' + celebrationContent + '</p>' + (celebrationLink ? '<p><a href=\"' + celebrationLink + '\" style=\"color: #3498db; text-decoration: none;\">Learn more →</a></p>' : '') + '</div>' : '';\n\n// Build HTML content with perfected layout\nconst htmlContent = '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Daily Benedictine Reflection</title></head><body style=\"margin: 0; padding: 0; font-family: Georgia, Times New Roman, serif; background-color: #f8f9fa; color: #2c3e50;\"><div style=\"max-width: 800px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);\"><div style=\"background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); color: white; padding: 40px 20px; text-align: center;\"><h1 style=\"margin: 0; font-size: 2.5em; font-weight: normal; letter-spacing: 2px;\">Daily Benedictine Reflection</h1></div><div style=\"background-color: #ecf0f1; padding: 20px; text-align: center; border-bottom: 1px solid #bdc3c7;\"><div style=\"display: inline-flex; align-items: center; gap: 30px;\"><span style=\"color: #34495e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;\">' + liturgicalDay + '</span></div></div><div style=\"padding: 40px;\"><div style=\"text-align: center; margin-bottom: 40px;\"><div style=\"width: 60px; height: 3px; background-color: #3498db; margin: 20px auto;\"></div></div><div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Today\\'s Readings</h3><div style=\"margin-bottom: 15px;\"><strong>First Reading:</strong> ' + readingsData.readings.firstReading + '<br><strong>Psalm:</strong> ' + readingsData.readings.psalm + '<br>' + secondReadingLine + '<strong>Gospel:</strong> ' + readingsData.readings.gospel + '</div><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-top: 20px;\">' + liturgicalReadings + '</p></div><div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Today\\'s Focus: ' + dateInfo.theme + '</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e;\">' + spiritualFocus + '</p></div>' + celebrationSection + '<div style=\"margin-bottom: 35px;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Reflection & Challenge</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e;\">' + reflection + '</p><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; margin-top: 20px;\"><strong style=\"font-weight: bold; color: #2980b9;\">Practical Spiritual Challenge:</strong> ' + practicalChallenge + '</p></div><div style=\"background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%); padding: 30px; border-radius: 8px; text-align: center; border: 1px solid #bdc3c7;\"><h3 style=\"color: #2980b9; font-size: 1.3em; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: normal;\">Daily Prayer</h3><p style=\"line-height: 1.8; font-size: 16px; color: #34495e; font-style: italic;\">' + prayer + '</p></div></div><div style=\"background-color: #34495e; color: #ecf0f1; padding: 30px; text-align: center;\"><p style=\"margin: 0; font-size: 14px;\">Ora et Labora<br><a href=\"' + readingsData.usccbLink + '\" style=\"color: #3498db; text-decoration: none;\">View Today\\'s Official Readings</a></p></div></div></body></html>';\n\nreturn {\n  htmlContent: htmlContent,\n  subject: 'Daily Benedictine Reflection - ' + dateInfo.today\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -189,15 +198,18 @@
         800,
         96
       ],
-      "name": "Build HTML"
+      "name": "Build HTML",
+      "id": "1ca7a225-6ee5-4ac3-b16b-38fefa519825"
     },
     {
       "parameters": {
-        "fromEmail": "christopher.bisgaard@gmail.com",
+        "fromEmail": "cpbjr@mac.com",
         "toEmail": "cpbjr@mac.com",
         "subject": "=Daily Spiritual Email for  {{ $('Format Date').item.json.today }}",
         "html": "={{ $json.htmlContent }}",
-        "options": {}
+        "options": {
+          "appendAttribution": false
+        }
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
@@ -206,33 +218,37 @@
         96
       ],
       "name": "Send email",
+      "id": "a00e758f-1016-4b86-bf20-7e9ede15de21",
+      "webhookId": "ea0fdf11-3850-4953-90b7-7e96ca46e44f",
       "credentials": {
         "smtp": {
-          "id": "t5muBt48UrDocNe8",
-          "name": "Google SMTP account"
+          "id": "TJL8fZXRR3V4XIvv",
+          "name": "icloud-smtp"
         }
       }
     },
     {
       "parameters": {
-        "model": "x-ai/grok-4",
+        "model": "grok-4-fast-reasoning",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
       "typeVersion": 1,
       "position": [
-        224,
-        288
+        208,
+        304
       ],
-      "name": "OpenRouter Chat Model",
+      "id": "a8a6b4e4-4728-4808-8627-331518e67a3c",
+      "name": "xAI Grok Chat Model",
       "credentials": {
-        "openRouterApi": {
-          "id": "YxHKEc4tsQR19kOm",
-          "name": "OpenRouter account"
+        "xAiApi": {
+          "id": "8qkqoneNG4ooi65e",
+          "name": "xAi account"
         }
       }
     }
   ],
+  "pinData": {},
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -351,7 +367,7 @@
         ]
       ]
     },
-    "OpenRouter Chat Model": {
+    "xAI Grok Chat Model": {
       "ai_languageModel": [
         [
           {
@@ -363,7 +379,22 @@
       ]
     }
   },
+  "active": true,
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "versionId": "25ce6633-0168-45b8-97a7-b5f3bb8cd7ab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4d01e7d5c138ac06d018a2006755ec851e94bc9ce57b975a2b2422a695af7aea"
+  },
+  "id": "XJihu836eFcsVAKI",
+  "tags": [
+    {
+      "updatedAt": "2025-11-09T21:47:54.025Z",
+      "createdAt": "2025-11-09T21:47:54.025Z",
+      "id": "WaKVEiBne912oGCF",
+      "name": "production"
+    }
+  ]
 }
