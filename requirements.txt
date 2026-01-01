@@ -1,0 +1,5 @@
+requests
+jinja2
+google-generativeai
+python-dotenv
+pydantic-settings

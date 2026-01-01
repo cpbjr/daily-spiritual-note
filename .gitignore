@@ -1,0 +1,16 @@
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Preview files
+preview.html
+
+# IDE files
+.vscode/
+.idea/

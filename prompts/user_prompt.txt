@@ -1,0 +1,21 @@
+Create today's Benedictine daily summary using this data:
+
+**Date & Theme:**
+- Today: {{ today }}
+- Day: {{ day_of_week }}
+- Benedictine Theme: {{ theme }}
+
+**Liturgical Information:**
+- Season: {{ season }}
+- First Reading: {{ first_reading }}
+- Psalm: {{ psalm }}
+{% if second_reading %}- Second Reading: {{ second_reading }}{% endif %}
+- Gospel: {{ gospel }}
+
+**Celebration Information:**
+- Has Celebration Today: {{ has_saint }}
+{% if saint %}- Celebration: {{ saint.name }} ({{ saint.type }})
+- Quote: "{{ saint.quote }}"
+- Description: {{ saint.description }}{% endif %}
+
+Generate the spiritual reflection following the structured format, integrating the Benedictine theme with today's readings and celebration (if present). Include a practical spiritual challenge related to {{ theme }}.

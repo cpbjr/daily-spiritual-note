@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Spiritual Reflection</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background-color: #f0f2f5; color: #2c3e50;">
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <!-- Title Header -->
+        <div style="background-color: #2c3e50; color: #ffffff; padding: 40px 20px; text-align: center;">
+            <h1 style="margin: 0; font-weight: normal; letter-spacing: 1px; text-transform: uppercase;">
+                <span style="font-size: 32px;">D</span><span style="font-size: 24px;">aily</span>
+                <span style="font-size: 32px;">B</span><span style="font-size: 24px;">enedictine</span>
+                <span style="font-size: 32px;">R</span><span style="font-size: 24px;">eflection</span>
+            </h1>
+        </div>
+
+        <!-- Liturgical Subheader -->
+        <div style="background-color: #ecf0f1; padding: 15px; text-align: center; border-bottom: 1px solid #bdc3c7;">
+            <div style="color: #2c3e50; letter-spacing: 2px;">
+                <span style="font-size: 18px;">{{ liturgical_day[0] }}</span><span
+                    style="font-size: 14px; text-transform: uppercase;">{{ liturgical_day[1:] }}</span>
+            </div>
+        </div>
+
+        <div style="padding: 40px;">
+            <!-- 1. Focus & Theme Card -->
+            <div style="margin-bottom: 40px; border: 1px solid #e1e4e8; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #2c3e50; color: #ffffff; padding: 12px 20px;">
+                    <h3 style="margin: 0; letter-spacing: 1px; text-transform: uppercase; font-weight: normal;">
+                        <span style="font-size: 18px;">F</span><span style="font-size: 14px;">ocus</span>:
+                        <span style="font-size: 18px;">{{ theme[0] }}</span><span
+                            style="font-size: 14px; text-transform: uppercase;">{{ theme[1:] }}</span>
+                    </h3>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="margin: 0; font-size: 17px; line-height: 1.8; color: #2c3e50;">
+                        {{ ai_output.spiritualFocus }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Readings Card -->
+            <div style="margin-bottom: 40px; border: 1px solid #e1e4e8; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #2c3e50; color: #ffffff; padding: 12px 20px;">
+                    <h3 style="margin: 0; letter-spacing: 1px; text-transform: uppercase; font-weight: normal;">
+                        <span style="font-size: 18px;">T</span><span style="font-size: 14px;">oday's</span>
+                        <span style="font-size: 18px;">R</span><span style="font-size: 14px;">eadings</span>
+                    </h3>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="font-size: 16px; line-height: 1.8; margin-bottom: 20px;">
+                        <strong>First Reading:</strong> <a href="{{ readings.firstReading.youversion_link }}"
+                            target="_blank" style="color: #2980b9; text-decoration: none; font-weight: bold;">{{
+                            readings.firstReading.citation }}</a><br>
+                        <strong>Psalm:</strong> <a href="{{ readings.psalm.youversion_link }}" target="_blank"
+                            style="color: #2980b9; text-decoration: none; font-weight: bold;">{{ readings.psalm.citation
+                            }}</a><br>
+                        {% if readings.secondReading %}
+                        <strong>Second Reading:</strong> <a href="{{ readings.secondReading.youversion_link }}"
+                            target="_blank" style="color: #2980b9; text-decoration: none; font-weight: bold;">{{
+                            readings.secondReading.citation }}</a><br>
+                        {% endif %}
+                        <strong>Gospel:</strong> <a href="{{ readings.gospel.youversion_link }}" target="_blank"
+                            style="color: #2980b9; text-decoration: none; font-weight: bold;">{{
+                            readings.gospel.citation }}</a>
+                    </div>
+                    <p style="margin: 0; font-size: 17px; line-height: 1.8; color: #2c3e50;">
+                        {{ ai_output.liturgicalReadings }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3. Celebration Card -->
+            {% if ai_output.celebrationName %}
+            <div style="margin-bottom: 40px; border: 1px solid #e1e4e8; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #2c3e50; color: #ffffff; padding: 12px 20px;">
+                    <h3 style="margin: 0; letter-spacing: 1px; text-transform: uppercase; font-weight: normal;">
+                        {% set title = ai_output.sectionTitle %}
+                        <span style="font-size: 18px;">{{ title[0] }}</span><span
+                            style="font-size: 14px; text-transform: uppercase;">{{ title[1:] }}</span>
+                    </h3>
+                </div>
+                <div style="padding: 20px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; color: #1c1e21; font-weight: bold;">{{
+                        ai_output.celebrationName }}</h4>
+                    <p style="margin: 0 0 15px 0; font-size: 17px; line-height: 1.8; color: #2c3e50;">
+                        {{ ai_output.celebrationContent }}
+                    </p>
+                    {% if ai_output.celebrationLink %}
+                    <a href="{{ ai_output.celebrationLink }}" target="_blank"
+                        style="color: #2980b9; text-decoration: none; font-weight: bold; font-size: 14px;">Learn more
+                        →</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 4. Reflection Card -->
+            <div style="margin-bottom: 40px; border: 1px solid #e1e4e8; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #2c3e50; color: #ffffff; padding: 12px 20px;">
+                    <h3 style="margin: 0; letter-spacing: 1px; text-transform: uppercase; font-weight: normal;">
+                        <span style="font-size: 18px;">R</span><span style="font-size: 14px;">eflection</span> &
+                        <span style="font-size: 18px;">C</span><span style="font-size: 14px;">hallenge</span>
+                    </h3>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="margin: 0 0 20px 0; font-size: 17px; line-height: 1.8; color: #2c3e50;">
+                        {{ ai_output.reflection }}
+                    </p>
+                    <p style="margin: 0; font-size: 17px; line-height: 1.8; color: #2c3e50;">
+                        <strong
+                            style="color: #2c3e50; text-transform: uppercase; font-size: 14px; letter-spacing: 1px;">Practical
+                            Spiritual Challenge:</strong> {{ ai_output.practicalChallenge }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 5. Prayer Section -->
+            <div
+                style="background-color: #ecf0f1; padding: 35px 25px; border-radius: 8px; text-align: center; border: 1px solid #bdc3c7;">
+                <h3
+                    style="color: #2c3e50; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: normal;">
+                    <span style="font-size: 1.25em;">D</span>aily <span style="font-size: 1.25em;">P</span>rayer
+                </h3>
+                <p style="line-height: 1.8; font-size: 19px; color: #2c3e50; font-style: italic; margin: 0;">
+                    "{{ ai_output.prayer }}"
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #2c3e50; color: #ecf0f1; padding: 30px; text-align: center;">
+            <p style="margin: 0; font-size: 14px;">
+                Ora et Labora<br>
+                <a href="{{ usccbLink }}" target="_blank" style="color: #3498db; text-decoration: none;">View Today's
+                    Official Readings</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
