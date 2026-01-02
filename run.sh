@@ -10,4 +10,5 @@ if [ -f .env ]; then
 fi
 
 # Run the script using the virtual environment's python
-./venv/bin/python3 main.py >> cron.log 2>&1
+./venv/bin/python3 main.py "$@" >> cron.log 2>&1
+

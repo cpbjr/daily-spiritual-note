@@ -1,27 +1,26 @@
 # Daily Summary Project Documentation
 
-**Status**: ✅ IN PRODUCTION (Stable)
+**Status**: ✅ IN PRODUCTION (Python)
 **Priority**: 5 (Maintenance Only)
-**Last Updated**: 2025-10-27
+**Last Updated**: 2026-01-02
 
 ## Project Overview
 
-Daily Catholic readings delivery with AI-generated spiritual content.
+Daily Catholic readings delivery with AI-generated spiritual content, migrated from n8n to a standalone Python application.
 
 ## Status
 
-✅ **IN PRODUCTION (STABLE)** - All features deployed and verified working
-🚀 **Active** - Workflow running daily at 4:00 AM EST
+✅ **IN PRODUCTION (STABLE)** - Migrated to Python on 2026-01-01
+🚀 **Active** - Running daily at 4:00 AM MT (11:00 AM UTC)
 📧 **Delivering** - Daily emails with readings, reflections, and historical events
-🔧 **Maintenance Mode** - No active development, monitoring only
+🔧 **Server** - Hosted on Hetzner (whitepine)
 
 ## Tech Stack
 
-- **n8n workflows** - AI Agent + Code Tool architecture
-- **Token-efficient design** - <1000 tokens (vs 15k alternative)
-- **Liturgical data** - GitHub Pages API for readings
-- **Production Server** - https://n8n.whitepine-tech.com
-- **n8n API Key** - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMDgxMTM3OC0wYjViLTRhZGQtOTkwMi01OTJiZTIwOTZkMjEiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYxNDI2ODAxfQ.vAhvKbvpGFTlYbmnOCs3TLIgAe5cLeR4aPviF7Wc2q4
+- **Python 3.12** - Core application logic
+- **AI Providers** - Dual support for xAI (Grok-4) and Google (Gemini)
+- **SMTP** - Apple iCloud Mail (cpbjr@mac.com)
+- **Deployment** - Cron-based execution on Ubuntu 24.04 (Hetzner)
 
 ## 📚 Universal n8n Patterns
 
@@ -83,9 +82,9 @@ See [System/current-issue.md](System/current-issue.md) for complete technical an
 
 ## Quick Reference
 
-**Production Workflow ID:** `h2DLuz8HuZKuLZhq`
-**Schedule:** 4:00 AM EST daily
-**Email Delivery:** christopher.bisgaard@gmail.com → cpbjr@mac.com
+**Production Path:** `/home/deploy/daily-summary`
+**Schedule:** 4:00 AM MT (11:00 AM UTC) daily
+**Email Delivery:** cpbjr@mac.com → cpbjr@mac.com
 **API Endpoint:** https://cpbjr.github.io/catholic-readings-api/
 
 ## Notes
