@@ -67,10 +67,10 @@ def main():
         "day_of_week": day_name,
         "theme": theme,
         "season": readings_data.get("season", "Ordinary Time"),
-        "first_reading": readings_data["readings"]["firstReading"]["citation"],
-        "psalm": readings_data["readings"]["psalm"]["citation"],
+        "first_reading": readings_data["readings"].get("firstReading", {}).get("citation"),
+        "psalm": readings_data["readings"].get("psalm", {}).get("citation"),
         "second_reading": readings_data["readings"].get("secondReading", {}).get("citation"),
-        "gospel": readings_data["readings"]["gospel"]["citation"],
+        "gospel": readings_data["readings"].get("gospel", {}).get("citation"),
         "has_saint": saint_data is not None,
         "saint": saint_data.get("saint") if saint_data else None
     }
