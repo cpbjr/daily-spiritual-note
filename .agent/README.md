@@ -11,7 +11,7 @@ Daily Catholic readings delivery with AI-generated spiritual content, migrated f
 ## Status
 
 ✅ **IN PRODUCTION (STABLE)** - Migrated to Python on 2026-01-01
-🚀 **Active** - Running daily at 4:00 AM MT (11:00 AM UTC)
+🚀 **Active** - Running daily at 4:00 AM MDT (10:00 AM UTC)
 📧 **Delivering** - Daily emails with readings, reflections, and historical events
 🔧 **Server** - Hosted on Hetzner (whitepine)
 
@@ -83,7 +83,7 @@ See [System/current-issue.md](System/current-issue.md) for complete technical an
 ## Quick Reference
 
 **Production Path:** `/home/deploy/daily-summary`
-**Schedule:** 4:00 AM MT (11:00 AM UTC) daily
+**Schedule:** 4:00 AM MDT (10:00 AM UTC) daily
 **Email Delivery:** cpbjr@mac.com → cpbjr@mac.com
 **API Endpoint:** https://cpbjr.github.io/catholic-readings-api/
 
