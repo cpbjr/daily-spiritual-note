@@ -1,6 +1,6 @@
 ## Active Tasks
 
-**Last Updated:** 2026-06-24
+**Last Updated:** 2026-06-24 (cleanup & improvements shipped)
 
 - [/] Monitor cron execution and log reliability on production server.
   - Deployment now automated via GitHub Actions (push to main → git pull on whitepine)
