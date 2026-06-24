@@ -93,8 +93,13 @@
                     <p style="margin: 0 0 15px 0; font-size: 17px; line-height: 1.8; color: #2c3e50;">
                         {{ ai_output.celebrationContent }}
                     </p>
-                    {% if ai_output.celebrationLink %}
-                    <a href="{{ ai_output.celebrationLink }}" target="_blank"
+                    {% if celebration and celebration.quote %}
+                    <blockquote style="margin: 15px 0 0 0; padding: 10px 18px; border-left: 3px solid #2c3e50; font-style: italic; color: #2c3e50; font-size: 16px; line-height: 1.7;">
+                        "{{ celebration.quote }}"
+                    </blockquote>
+                    {% endif %}
+                    {% if celebration and celebration_link %}
+                    <a href="{{ celebration_link }}" target="_blank"
                         style="color: #2980b9; text-decoration: none; font-weight: bold; font-size: 14px;">Learn more
                         →</a>
                     {% endif %}

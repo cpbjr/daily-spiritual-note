@@ -2,7 +2,7 @@ import argparse
 import datetime
 import os
 import webbrowser
-from services.readings_service import ReadingsService
+from services.readings_service import ReadingsService, build_celebration_link
 from services.theme_service import ThemeService
 from services.ai_service import AIService
 from services.email_service import EmailService
@@ -89,12 +89,21 @@ def main():
     email_svc = EmailService()
     liturgical_day = get_liturgical_day(target_date, ai_context["season"], day_name)
     
+    celebration = saint_data.get("saint") if saint_data else None
+    celebration_link = (
+        build_celebration_link(celebration["name"])
+        if celebration and celebration.get("name")
+        else None
+    )
+
     context = {
         "liturgical_day": liturgical_day,
         "readings": readings_data["readings"],
         "theme": theme,
         "ai_output": ai_output,
-        "usccbLink": readings_data["usccbLink"]
+        "usccbLink": readings_data["usccbLink"],
+        "celebration": celebration,
+        "celebration_link": celebration_link,
     }
     
     html_content = email_svc.render_html(context)
