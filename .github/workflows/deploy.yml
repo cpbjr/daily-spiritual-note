@@ -1,0 +1,21 @@
+name: Deploy to Whitepine
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to whitepine
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 5.78.128.255
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          script: |
+            cd /home/deploy/daily-summary
+            git pull origin main
+            echo "Deployed at $(date)" >> cron.log
