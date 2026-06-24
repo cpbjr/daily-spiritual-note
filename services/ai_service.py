@@ -1,9 +1,13 @@
 import google.generativeai as genai
 import json
 import os
+import sys
 from typing import Dict
 from jinja2 import Template
 from config import settings
+
+sys.path.insert(0, os.path.expanduser("~/cost-logs"))
+from cost_logger import log_api_call
 
 class AIService:
     def __init__(self):
@@ -47,6 +51,10 @@ class AIService:
                 response_mime_type="application/json"
             )
         )
+        if hasattr(response, "usage_metadata") and response.usage_metadata:
+            log_api_call("daily-summary", "google", settings.AI_MODEL,
+                         input_tokens=getattr(response.usage_metadata, "prompt_token_count", 0),
+                         output_tokens=getattr(response.usage_metadata, "candidates_token_count", 0))
         try:
             return json.loads(response.text)
         except json.JSONDecodeError:
@@ -69,11 +77,14 @@ class AIService:
         }
         
         response = requests.post(self.xai_url, headers=headers, json=payload)
-        # print(f"DEBUG xAI Response: {response.json()}")
         response.raise_for_status()
-        
+
         try:
             data = response.json()
+            if "usage" in data:
+                log_api_call("daily-summary", "xai", settings.AI_MODEL,
+                             input_tokens=data["usage"].get("prompt_tokens", 0),
+                             output_tokens=data["usage"].get("completion_tokens", 0))
             content = data["choices"][0]["message"]["content"]
             return json.loads(content)
         except (KeyError, json.JSONDecodeError) as e:
