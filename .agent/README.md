@@ -14,14 +14,14 @@ Daily Catholic readings delivery with AI-generated spiritual content. Python cro
 |------|-------|
 | Production path | `/home/deploy/daily-summary` |
 | Schedule | 4:00 AM MDT (10:00 UTC) daily |
-| AI model | xAI `grok-4-fast-reasoning` |
+| AI model | Nous `Hermes-4-405B` (primary), xAI `grok-4.20-0309-reasoning` (fallback) |
 | Email | cpbjr@mac.com → cpbjr@mac.com |
 | Readings API | https://cpbjr.github.io/catholic-readings-api/ |
 
 ## Tech Stack
 
 - **Python 3.12** — core application
-- **xAI Grok** — AI generation (Gemini as fallback)
+- **Nous Research Hermes** — AI generation (xAI Grok as fallback)
 - **SMTP** — Apple iCloud Mail
 - **Deployment** — GitHub Actions → SSH → git pull on whitepine
 
