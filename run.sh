@@ -2,7 +2,7 @@
 # run.sh - Wrapper for Daily Summary Cron Job
 
 # Change to the project directory
-cd /home/cpbjr/WhitePineTech/Projects/Daily\ Summary
+cd /home/deploy/daily-summary
 
 # Source environment variables if they are not picked up by cron
 if [ -f .env ]; then
