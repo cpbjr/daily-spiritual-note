@@ -13,7 +13,7 @@ class ReadingsService:
         year, month, day = date_str.split('-')
         api_url = f"{settings.READINGS_API_BASE_URL}/readings/{year}/{month}-{day}.json"
 
-        response = requests.get(api_url)
+        response = requests.get(api_url, timeout=30)
         response.raise_for_status()
         data = response.json()
 
@@ -32,13 +32,13 @@ class ReadingsService:
         year, month, day = date_str.split('-')
         api_url = f"{settings.READINGS_API_BASE_URL}/liturgical-calendar/{year}/{month}-{day}.json"
 
-        response = requests.get(api_url)
+        response = requests.get(api_url, timeout=30)
         if response.status_code == 404:
             return None
         response.raise_for_status()
         data = response.json()
 
-        # Map 'celebration' to 'saint' to match n8n logic
+        # Normalize the API's 'celebration' field to the 'saint' key used downstream
         if 'celebration' in data:
             return {"saint": data['celebration']}
         return None
@@ -47,7 +47,8 @@ class ReadingsService:
     def generate_youversion_link(citation: str) -> str:
         """
         Converts a citation like 'Luke 18:35-43' or '1 Maccabees 1:10-15'
-        to 'https://bible.com/bible/3548/luk.18.35-43.RSVCI'
+        to 'https://bible.com/bible/2015/luk.18.35-43.NRSVCI'
+        (version id and abbreviation come from settings).
         """
         # Mapping common Catholic books to YouVersion abbreviations
         book_map = {
@@ -85,7 +86,7 @@ class ReadingsService:
         # Get abbreviation, fallback to first 3 letters if not in map
         abbr = book_map.get(book_name, book_name[:3].upper()).lower()
 
-        # Format: bible.com/bible/{VERSION}/{ABBR}.{CHAPTER}.{VERSES}.RSVCI
+        # Format: bible.com/bible/{VERSION}/{ABBR}.{CHAPTER}.{VERSES}.{BIBLE_VERSION_ABBR}
         # We need to replace colons with dots and spaces with nothing
         ref_formatted = reference.replace(":", ".").replace(" ", "")
 

@@ -9,7 +9,7 @@ Daily Catholic readings delivered by email — AI-generated reflections, saint o
 
 ## What It Does
 
-Each morning the script pulls the day's Catholic readings from the USCCB API, generates a spiritual reflection using xAI Grok, and emails the result to cpbjr@mac.com. Content includes:
+Each morning the script pulls the day's Catholic readings from the USCCB API, generates a spiritual reflection using Nous Research (xAI Grok as fallback), and emails the result to cpbjr@mac.com. Content includes:
 
 - Daily Mass readings (Gospel, Epistle, Psalm)
 - Saint of the day
@@ -21,7 +21,7 @@ Each morning the script pulls the day's Catholic readings from the USCCB API, ge
 | Layer | Detail |
 |-------|--------|
 | Language | Python 3.12 |
-| AI | xAI `grok-4-fast-reasoning` (Gemini as fallback) |
+| AI | Nous `Hermes-4-405B` (primary), xAI `grok-4.20-0309-reasoning` (fallback), Google Gemini (optional third tier) |
 | Email | Apple iCloud SMTP (`cpbjr@mac.com`) |
 | Readings API | `https://cpbjr.github.io/catholic-readings-api/` |
 | Server | Hetzner whitepine, `deploy` user |
@@ -51,7 +51,7 @@ main.py                  # entry point
 config.py                # settings loaded from .env
 run.sh                   # cron wrapper (loads .env, runs main.py)
 services/
-  ai_service.py          # xAI / Gemini generation
+  ai_service.py          # Nous / xAI / Gemini generation
   readings_service.py    # USCCB API client
   email_service.py       # SMTP delivery
   theme_service.py       # liturgical theme helpers
