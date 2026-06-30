@@ -8,7 +8,14 @@ from jinja2 import Template
 from config import settings
 
 sys.path.insert(0, os.path.expanduser("~/cost-logs"))
-from cost_logger import log_api_call
+try:
+    from cost_logger import log_api_call
+except ImportError:
+    # cost_logger lives on the production server (~/cost-logs). When it is not
+    # available (local dev, dry-run, fresh server) fall back to a no-op so the
+    # whole application doesn't fail to import.
+    def log_api_call(*args, **kwargs):
+        pass
 
 class AIService:
     def __init__(self):
