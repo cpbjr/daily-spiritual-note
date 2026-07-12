@@ -8,18 +8,20 @@ class Settings(BaseSettings):
     ENV: str = "production"
 
     # AI Provider Settings
-    AI_PROVIDER: str = "nous"           # primary provider
-    AI_FALLBACK_PROVIDER: str = "xai"  # "" to disable fallback
+    # xai-oauth = Hermes SuperGrok/Premium+ OAuth (auth.json), not XAI_API_KEY
+    AI_PROVIDER: str = "xai-oauth"
+    AI_FALLBACK_PROVIDER: str = "nous"  # "" to disable fallback
 
     # Nous Research
     NOUS_API_KEY: str = Field(default="", alias="NOUS_RESEARCH_API_KEY")
     NOUS_MODEL: str = "Hermes-4-405B"
     NOUS_URL: str = "https://inference-api.nousresearch.com/v1/chat/completions"
 
-    # xAI
+    # xAI (API key path) and xAI OAuth (subscription path)
     XAI_API_KEY: str = ""
-    XAI_MODEL: str = "grok-4.20-0309-reasoning"
+    XAI_MODEL: str = "grok-4.3"
     XAI_URL: str = "https://api.x.ai/v1/chat/completions"
+    XAI_OAUTH_MODEL: str = "grok-4.3"
 
     # Google Gemini
     GEMINI_API_KEY: str = ""

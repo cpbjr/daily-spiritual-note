@@ -17,3 +17,6 @@ preview.html
 
 # Local logs
 cron.log
+
+# App cron logs (beefy)
+logs/
