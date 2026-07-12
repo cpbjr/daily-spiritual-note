@@ -1,4 +1,4 @@
-name: Deploy to Whitepine
+name: Deploy to Beefy
 
 on:
   push:
@@ -8,13 +8,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to whitepine
+      - name: Deploy to beefy
         uses: appleboy/ssh-action@v1
         with:
-          host: 5.78.128.255
-          username: deploy
+          host: 5.78.152.85
+          username: buduser
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd /home/deploy/daily-summary
+            set -euo pipefail
+            cd /home/buduser/apps/daily-spiritual-note
             git pull origin main
-            echo "Deployed at $(date)" >> cron.log
+            mkdir -p logs
+            echo "Deployed at $(date -Is)" >> logs/deploy.log

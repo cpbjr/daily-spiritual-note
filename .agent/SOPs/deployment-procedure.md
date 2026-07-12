@@ -1,109 +1,107 @@
 # Deployment Procedure: Daily Spiritual Note
 
-**Last Updated:** 2026-06-24
-**Purpose:** How changes get from local development to the production server
+**Last Updated:** 2026-07-12  
+**Purpose:** How changes get from development to production
 
 ---
 
 ## Overview
 
-This is a Python cron job running on the **whitepine** Hetzner server. Deployment is
-fully automated via GitHub Actions — pushing to `main` triggers an SSH-based `git pull`
-on the server within ~30 seconds.
+This is a Python job scheduled by **Hermes cron** on the **beefy** Hetzner server. Deployment is automated via GitHub Actions: pushing to `main` triggers an SSH-based `git pull` on beefy within ~30 seconds.
 
-**Production path:** `/home/deploy/daily-summary`
-**Server:** whitepine (Hetzner, 5.78.128.255), `deploy` user
-**GitHub repo:** `https://github.com/cpbjr/daily-spiritual-note`
-**Schedule:** `0 10 * * *` (10:00 UTC = 4:00 AM MDT) via crontab
+| Item | Value |
+|------|--------|
+| **Production path** | `/home/buduser/apps/daily-spiritual-note` |
+| **Server** | beefy (Hetzner, `5.78.152.85`), user `buduser` |
+| **GitHub repo** | `https://github.com/cpbjr/daily-spiritual-note` |
+| **Schedule** | Hermes cron `daily-spiritual-note` — `0 4 * * *` America/Denver (4:00 AM MT) |
+| **Wrapper** | `~/.hermes/scripts/daily-spiritual-note.sh` → `main.py` |
+
+**AI path (production defaults):** primary `xai-oauth` / `grok-4.3` (Hermes SuperGrok OAuth on beefy), fallback `nous` / `Hermes-4-405B`.
 
 ---
 
 ## Normal Deployment Flow
 
 ```
-Edit locally → commit → git push origin main → GitHub Action deploys → server updated
+Edit (laptop or beefy) → commit → git push origin main → GitHub Action deploys → beefy updated
 ```
 
-1. Make changes locally in `/home/cpbjr/WhitePineTech/Projects/Daily-Summary`
-2. Commit and push to `main`
-3. GitHub Action (`deploy.yml`) SSHes into whitepine and runs `git pull origin main`
-4. Changes are live within ~30 seconds
-5. Next cron execution picks up the new code
+1. Make changes and push to `main` (or merge a PR).
+2. GitHub Action (`.github/workflows/deploy.yml`) SSHes into beefy as `buduser` and runs `git pull origin main`.
+3. Changes are live within ~30 seconds.
+4. Next Hermes cron run picks up the new code (or re-run the job to verify).
 
-**The `.env` file on the server is NOT in git** — it stays untouched by deployments.
-The `venv/` and `cron.log` are also ignored by git.
+**The `.env` file on the server is NOT in git** — it stays untouched by deployments.  
+`venv/`, `logs/`, and local secrets are ignored by git.
 
 ---
 
 ## GitHub Actions Setup
 
-The workflow is at `.github/workflows/deploy.yml`.
+Workflow: `.github/workflows/deploy.yml`.
 
-### Secrets required (set in repo Settings → Secrets):
-- `DEPLOY_SSH_KEY` — private key for `deploy@whitepine` (`~/.ssh/github_actions_deploy`)
-- `DEPLOY_KNOWN_HOSTS` — whitepine's host keys (from `ssh-keyscan -H 5.78.128.255`)
+### Secrets (repo Settings → Secrets and variables → Actions)
 
-The deploy key (`~/.ssh/github_actions_deploy`) is already in `authorized_keys` on the server.
+| Secret | Purpose |
+|--------|---------|
+| `DEPLOY_SSH_KEY` | Private key authorized for `buduser@5.78.152.85` (beefy deploy key) |
 
-### If the Action fails:
-1. Check Actions tab on GitHub for error output
-2. Common causes: SSH key expired/removed, server unreachable, git conflict on server
-3. Manual fallback: `ssh whitepine "cd /home/deploy/daily-summary && git pull origin main"`
+Suggested key path on beefy (private key never committed):
+
+```bash
+~/.ssh/github_actions_deploy_beefy
+# public key must be in buduser's ~/.ssh/authorized_keys
+```
+
+### If the Action fails
+
+1. Check the Actions tab on GitHub for error output.
+2. Common causes: SSH key rotated/removed, server unreachable, git conflict on beefy.
+3. Manual fallback:
+
+```bash
+ssh buduser@5.78.152.85 'cd /home/buduser/apps/daily-spiritual-note && git pull origin main'
+```
 
 ---
 
 ## Server Git Setup
 
-The server's `/home/deploy/daily-summary` is a git repo tracking `origin/main`:
 ```bash
-# Verify:
-ssh whitepine "cd /home/deploy/daily-summary && git remote -v && git log --oneline -3"
+cd /home/buduser/apps/daily-spiritual-note
+git remote -v
+git log --oneline -3
+git status
 ```
 
-**Important:** The server may have local file differences (e.g., older `.gitignore`, `run.sh`).
-These will be overwritten on `git pull` if they differ from `main`. The `.env` file is safe
-because it's in `.gitignore`.
+Keep the working tree clean of uncommitted production-only edits (or commit them).  
+`.env` is safe because it is gitignored.
 
 ---
 
 ## Cron Configuration
 
-On the server, view/edit via `crontab -e` as `deploy` user:
-```
-0 10 * * * /home/deploy/daily-summary/run.sh
-```
+**Scheduler:** Hermes (`daily-spiritual-note`, job id may vary).  
+**Not** system crontab on whitepine.
 
-`run.sh` loads `.env`, then runs `./venv/bin/python3 main.py`, appending output to `cron.log`.
-
-To check recent execution output:
 ```bash
-ssh whitepine "tail -50 /home/deploy/daily-summary/cron.log"
+# Cron wrapper
+~/.hermes/scripts/daily-spiritual-note.sh
+
+# App logs
+/home/buduser/apps/daily-spiritual-note/logs/cron-YYYYMMDD.log
+```
+
+To check recent execution:
+
+```bash
+tail -50 /home/buduser/apps/daily-spiritual-note/logs/cron-$(date +%Y%m%d).log
 ```
 
 ---
 
-## Manual Trigger (Testing)
+## Whitepine (legacy)
 
-To run the email immediately without waiting for cron:
-```bash
-ssh whitepine "cd /home/deploy/daily-summary && ./run.sh"
-```
-
----
-
-## Environment Variables
-
-The `.env` file lives only on the server at `/home/deploy/daily-summary/.env`.
-See `.env.example` in the repo for required variables. To update a secret:
-```bash
-ssh whitepine "nano /home/deploy/daily-summary/.env"
-```
-
----
-
-## History Note
-
-This project was previously an n8n workflow (October 2025), then migrated to Python
-(January 2026). The old n8n deployment SOP (via REST API to AWS) is no longer relevant.
-The project was also extracted from the `AI_Automation` monorepo into its own repo
-(`cpbjr/daily-spiritual-note`) in June 2026.
+Earlier production lived on whitepine (`5.78.128.255`, user `deploy`, path `/home/deploy/daily-summary`).  
+After cutover, whitepine crontab for this app should stay **disabled** to avoid duplicate emails. The deploy workflow no longer targets whitepine.

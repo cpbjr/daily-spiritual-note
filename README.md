@@ -9,28 +9,28 @@ Daily Catholic readings delivered by email — AI-generated reflections, saint o
 
 ## What It Does
 
-Each morning the script pulls the day's Catholic readings from the USCCB API, generates a spiritual reflection using Nous Research (xAI Grok as fallback), and emails the result to cpbjr@mac.com. Content includes:
+Each morning the script pulls the day's Catholic readings from the GitHub Pages readings API, generates a spiritual reflection (xAI Grok via Hermes OAuth primary, Nous fallback), and emails the result to cpbjr@mac.com. Content includes:
 
 - Daily Mass readings (Gospel, Epistle, Psalm)
 - Saint of the day
 - AI-generated reflection
-- Three historical events for the date
+- Spiritual challenge and prayer
 
 ## Tech Stack
 
 | Layer | Detail |
 |-------|--------|
 | Language | Python 3.12 |
-| AI | Nous `Hermes-4-405B` (primary), xAI `grok-4.20-0309-reasoning` (fallback), Google Gemini (optional third tier) |
+| AI | xAI `grok-4.3` via Hermes `xai-oauth` (primary), Nous `Hermes-4-405B` (fallback), Google Gemini (optional) |
 | Email | Apple iCloud SMTP (`cpbjr@mac.com`) |
 | Readings API | `https://cpbjr.github.io/catholic-readings-api/` |
-| Server | Hetzner whitepine, `deploy` user |
-| Deployment | GitHub Actions → `git pull` on whitepine |
-| Schedule | cron `0 10 * * *` via `run.sh` |
+| Server | Hetzner beefy (`5.78.152.85`), user `buduser` |
+| Deployment | GitHub Actions → `git pull` on beefy |
+| Schedule | Hermes cron at 4:00 AM Mountain (`daily-spiritual-note.sh`) |
 
 ## Deployment
 
-Push to `main` → GitHub Action SSHes into whitepine → `git pull` → live in ~30s.
+Push to `main` → GitHub Action SSHes into beefy → `git pull` → live in ~30s.
 
 See [`.agent/SOPs/deployment-procedure.md`](.agent/SOPs/deployment-procedure.md) for full details.
 
