@@ -35,7 +35,12 @@ class Settings(BaseSettings):
 
     # Email Settings
     FROM_EMAIL: str = "cpbjr@mac.com"
+    # Comma-separated list of recipients (primary + any additional)
     TO_EMAIL: str = "cpbjr@mac.com"
+
+    def recipient_list(self) -> list[str]:
+        """Parse TO_EMAIL into a clean list of addresses."""
+        return [addr.strip() for addr in self.TO_EMAIL.split(",") if addr.strip()]
 
     # Readings API
     READINGS_API_BASE_URL: str = "https://cpbjr.github.io/catholic-readings-api"

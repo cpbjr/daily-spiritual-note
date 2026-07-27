@@ -26,10 +26,15 @@ class EmailService:
             print(f"Subject: {subject}")
             return
 
+        recipients = settings.recipient_list()
+        if not recipients:
+            print("WARNING: No TO_EMAIL recipients configured. Skipping email send.")
+            return
+
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = settings.FROM_EMAIL
-        msg['To'] = settings.TO_EMAIL
+        msg['To'] = ", ".join(recipients)
 
         part2 = MIMEText(html_content, 'html')
         msg.attach(part2)
@@ -37,4 +42,5 @@ class EmailService:
         with smtplib.SMTP(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
             server.starttls()
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.sendmail(settings.FROM_EMAIL, settings.TO_EMAIL, msg.as_string())
+            server.sendmail(settings.FROM_EMAIL, recipients, msg.as_string())
+        print(f"📬 Delivered to: {', '.join(recipients)}")
