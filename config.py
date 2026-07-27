@@ -35,12 +35,32 @@ class Settings(BaseSettings):
 
     # Email Settings
     FROM_EMAIL: str = "cpbjr@mac.com"
-    # Comma-separated list of recipients (primary + any additional)
+    # Comma-separated lists
     TO_EMAIL: str = "cpbjr@mac.com"
+    BCC_EMAIL: str = ""
 
-    def recipient_list(self) -> list[str]:
-        """Parse TO_EMAIL into a clean list of addresses."""
-        return [addr.strip() for addr in self.TO_EMAIL.split(",") if addr.strip()]
+    @staticmethod
+    def _parse_addrs(value: str) -> list[str]:
+        return [addr.strip() for addr in (value or "").split(",") if addr.strip()]
+
+    def to_list(self) -> list[str]:
+        """Visible To: recipients."""
+        return self._parse_addrs(self.TO_EMAIL)
+
+    def bcc_list(self) -> list[str]:
+        """BCC recipients (envelope only; not shown in headers)."""
+        return self._parse_addrs(self.BCC_EMAIL)
+
+    def envelope_recipients(self) -> list[str]:
+        """All SMTP envelope recipients (To + BCC), de-duplicated."""
+        seen: set[str] = set()
+        out: list[str] = []
+        for addr in self.to_list() + self.bcc_list():
+            key = addr.lower()
+            if key not in seen:
+                seen.add(key)
+                out.append(addr)
+        return out
 
     # Readings API
     READINGS_API_BASE_URL: str = "https://cpbjr.github.io/catholic-readings-api"

@@ -9,7 +9,7 @@ Daily Catholic readings delivered by email — AI-generated reflections, saint o
 
 ## What It Does
 
-Each morning the script pulls the day's Catholic readings from the GitHub Pages readings API, generates a spiritual reflection (xAI Grok via Hermes OAuth primary, Nous fallback), and emails the result to the comma-separated `TO_EMAIL` list (default: cpbjr@mac.com). Content includes:
+Each morning the script pulls the day's Catholic readings from the GitHub Pages readings API, generates a spiritual reflection (xAI Grok via Hermes OAuth primary, Nous fallback), and emails the result to `TO_EMAIL` (visible To) plus optional `BCC_EMAIL` (hidden BCC). Content includes:
 
 - Daily Mass readings (Gospel, Epistle, Psalm)
 - Saint of the day

@@ -20,21 +20,25 @@ class EmailService:
     def send_email(self, subject: str, html_content: str):
         """
         Sends an HTML email via SMTP.
+        BCC addresses are envelope-only so they stay hidden from To recipients.
         """
         if not settings.SMTP_PASSWORD:
             print("WARNING: SMTP_PASSWORD not set. Skipping email send.")
             print(f"Subject: {subject}")
             return
 
-        recipients = settings.recipient_list()
-        if not recipients:
-            print("WARNING: No TO_EMAIL recipients configured. Skipping email send.")
+        to_addrs = settings.to_list()
+        bcc_addrs = settings.bcc_list()
+        envelope = settings.envelope_recipients()
+        if not envelope:
+            print("WARNING: No TO_EMAIL/BCC_EMAIL recipients configured. Skipping email send.")
             return
 
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = settings.FROM_EMAIL
-        msg['To'] = ", ".join(recipients)
+        msg['To'] = ", ".join(to_addrs) if to_addrs else settings.FROM_EMAIL
+        # Do not set a Bcc header — keep BCC private via envelope RCPT TO only.
 
         part2 = MIMEText(html_content, 'html')
         msg.attach(part2)
@@ -42,5 +46,8 @@ class EmailService:
         with smtplib.SMTP(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
             server.starttls()
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.sendmail(settings.FROM_EMAIL, recipients, msg.as_string())
-        print(f"📬 Delivered to: {', '.join(recipients)}")
+            server.sendmail(settings.FROM_EMAIL, envelope, msg.as_string())
+
+        print(f"📬 Delivered To: {', '.join(to_addrs) if to_addrs else '(none)'}")
+        if bcc_addrs:
+            print(f"📬 BCC: {', '.join(bcc_addrs)}")
