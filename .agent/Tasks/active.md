@@ -1,7 +1,9 @@
 ## Active Tasks
 
-**Last Updated:** 2026-06-29
+**Last Updated:** 2026-08-15
 
+- [x] 2026-08-15: 4 AM cron crashed — template required `readings.firstReading`; Assumption API JSON omitted it. Guarded firstReading like psalm/secondReading. Manual resend delivered.
+- [ ] catholic-readings-api `readings/2026/08-15.json` still missing firstReading (USCCB Day: Revelation 11:19A; 12:1-6A, 10AB).
 - [/] Monitor cron execution and log reliability on production server.
   - Deployment now automated via GitHub Actions (push to main → git pull on whitepine)
   - Check cron.log periodically: `ssh whitepine "tail -50 /home/deploy/daily-summary/cron.log"`

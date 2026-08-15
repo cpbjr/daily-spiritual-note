@@ -54,9 +54,11 @@
                 </div>
                 <div style="padding: 20px;">
                     <div style="font-size: 16px; line-height: 1.8; margin-bottom: 20px;">
+                        {% if readings.firstReading %}
                         <strong>First Reading:</strong> <a href="{{ readings.firstReading.youversion_link }}"
                             target="_blank" style="color: #2980b9; text-decoration: none; font-weight: bold;">{{
                             readings.firstReading.citation }}</a><br>
+                        {% endif %}
                         {% if readings.psalm %}
                         <strong>Psalm:</strong> <a href="{{ readings.psalm.youversion_link }}" target="_blank"
                             style="color: #2980b9; text-decoration: none; font-weight: bold;">{{ readings.psalm.citation
