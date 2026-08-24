@@ -1,4 +1,4 @@
-Create today's Benedictine daily summary using this data:
+Create today's daily summary using this data. The Benedictine theme is a model for Christian life, not an address to monks:
 
 **Date & Theme:**
 - Today: {{ today }}
@@ -18,4 +18,4 @@ Create today's Benedictine daily summary using this data:
 - Quote: "{{ saint.quote }}"
 - Description: {{ saint.description }}{% endif %}
 
-Generate the spiritual reflection following the structured format, integrating the Benedictine theme with today's readings and celebration (if present). Include a practical spiritual challenge related to {{ theme }}.
+Generate the spiritual reflection following the structured format, integrating the Benedictine theme with today's readings and celebration (if present). Write to Christians in ordinary life. Do not refer to Benedictine monks, monastics, the cloister, or “we monks.” Use “Christians” instead. Include a practical spiritual challenge related to {{ theme }} that a lay Christian can do today.

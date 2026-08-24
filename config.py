@@ -19,9 +19,10 @@ class Settings(BaseSettings):
 
     # xAI (API key path) and xAI OAuth (subscription path)
     XAI_API_KEY: str = ""
-    XAI_MODEL: str = "grok-4.3"
+    XAI_MODEL: str = "grok-4.6"
     XAI_URL: str = "https://api.x.ai/v1/chat/completions"
-    XAI_OAUTH_MODEL: str = "grok-4.3"
+    XAI_OAUTH_MODEL: str = "grok-4.6"
+    XAI_REASONING_EFFORT: str = "low"
 
     # Google Gemini
     GEMINI_API_KEY: str = ""

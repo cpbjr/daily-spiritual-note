@@ -155,7 +155,7 @@ print(json.dumps({
         )
 
     def _generate_xai_oauth(self, user_prompt: str) -> Dict:
-        model = settings.XAI_OAUTH_MODEL or settings.XAI_MODEL or "grok-4.3"
+        model = settings.XAI_OAUTH_MODEL or settings.XAI_MODEL or "grok-4.6"
         api_key, base_url = self._resolve_xai_oauth(force_refresh=False)
         url = f"{base_url.rstrip('/')}/chat/completions"
 
@@ -198,6 +198,9 @@ print(json.dumps({
             "temperature": 0.7,
             "response_format": {"type": "json_object"},
         }
+        effort = (settings.XAI_REASONING_EFFORT or "").strip().lower()
+        if provider_name in ("xai-oauth", "xai") and effort:
+            payload["reasoning_effort"] = effort
 
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         try:
