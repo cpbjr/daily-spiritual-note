@@ -18,5 +18,8 @@ preview.html
 # Local logs
 cron.log
 
+# Daily Plan sidecar (generated each send)
+output/
+
 # App cron logs (beefy)
 logs/

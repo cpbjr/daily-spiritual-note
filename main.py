@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import json
 import os
 import webbrowser
 from services.readings_service import ReadingsService, build_celebration_link
@@ -108,6 +109,27 @@ def main():
     
     html_content = email_svc.render_html(context)
     subject = f"Daily Benedictine Reflection - {readable_today}"
+
+    # Sidecar for Daily Plan (4:00 AM). Cron has terminal+file only; do not
+    # make it scrape mail. Always write after HTML is built, including dry-run.
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+    os.makedirs(out_dir, exist_ok=True)
+    sidecar = {
+        "date": date_str,
+        "theme": theme,
+        "subject": subject,
+        "practicalChallenge": (ai_output or {}).get("practicalChallenge") or "",
+        "spiritualFocus": (ai_output or {}).get("spiritualFocus") or "",
+    }
+    dated_path = os.path.join(out_dir, f"{date_str}.json")
+    latest_path = os.path.join(out_dir, "latest.json")
+    with open(dated_path, "w") as f:
+        json.dump(sidecar, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    with open(latest_path, "w") as f:
+        json.dump(sidecar, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    print(f"📝 Challenge sidecar: {dated_path}")
 
     # 6. Action
     if args.dry_run:
