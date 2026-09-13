@@ -1,9 +1,9 @@
 class ThemeService:
     THEMES = {
         'Sunday': 'Worship & Community',
-        'Monday': 'Humility & Simplicity',
+        'Monday': 'Work',
         'Tuesday': 'Stability',
-        'Wednesday': 'Listening',
+        'Wednesday': 'Listening & Prayer',
         'Thursday': 'Hospitality & Kindness',
         'Friday': 'Sacrifice & Repentance',
         'Saturday': 'Rest & Beauty'
